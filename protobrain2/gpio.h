@@ -16,6 +16,6 @@ typedef struct {
 	uint8_t pulls_state;
 } iodef_t;
 
-extern iodef_t iodefs[23];
+extern iodef_t iodefs[4];
 
 #endif /* _GPIO_H_ */
