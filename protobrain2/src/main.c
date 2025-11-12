@@ -25,29 +25,33 @@
 
 // ADC values for automatic brightness adjustment (GL5528 photoresistor + 10k pulldown)
 
-#include <assert.h>
 #include <stdint.h>
-#include <stdlib.h>
 
-#include "main.h"
-#include "gpio.h"
-#include "pico/stdlib.h"
-#include "leds.h"
-#include "pico/time.h"
+#include <hardware/clocks.h>
+#include <pico/stdlib.h>
+#include <pico/time.h>
+
+#include "ws2812b/ws2812b.h"
 
 int main(void) {
     hard_assert(stdio_init_all());
 
-    // With FREF = 12MHz (Xtal osc), REFDIV = 1, FBDIV = 100: FOUTVCO = 12 / 1 * 100 = 1200
-    // With POSTDIV1 = 6, POSTDIV2 = 4: FOUTPOSTDIV = 1200 / 6 / 4 = 50MHz
-    set_sys_clock_pll(1200000000, 6, 4);
+    ws2812b_init();
+    sleep_ms(50);
 
-    // Init IOs
-    for (int c = 0; c < (sizeof(iodefs) / sizeof(iodefs[0])); c++) {
-        uint32_t n = iodefs[c].number;
-        gpio_set_dir(n, iodefs[c].direction);
-        gpio_set_function(n, iodefs[c].function);
-        gpio_set_pulls(n, iodefs[c].pulls_state & 1, iodefs[c].pulls_state & 2);
-        gpio_put(n, iodefs[c].pulls_state & 4);
+    // Loop: r g b white
+    while (1)
+    {
+        ws2812b_face_set_rgb(100, 0, 0);
+        sleep_ms(1000);
+
+        ws2812b_face_set_rgb(0, 100, 0);
+        sleep_ms(1000);
+
+        ws2812b_face_set_rgb(0, 0, 100);
+        sleep_ms(1000);
+
+        ws2812b_face_set_rgb(30, 30, 30);
+        sleep_ms(1000);
     }
 }
