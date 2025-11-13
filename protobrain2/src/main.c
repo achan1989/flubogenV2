@@ -33,25 +33,46 @@
 
 #include "ws2812b/ws2812b.h"
 
+static ws2812b_face_buffer_t face_buffer;
+
+static void fill_face_buf(wsb2812b_led_value_t value);
+
 int main(void) {
     hard_assert(stdio_init_all());
 
     ws2812b_init();
     sleep_ms(50);
 
+    wsb2812b_led_value_t red = {.r = 125, .g = 0, .b = 0};
+    wsb2812b_led_value_t green = {.r = 0, .g = 74, .b = 0};
+    wsb2812b_led_value_t blue = {.r = 0, .g = 0, .b = 255};
+    wsb2812b_led_value_t white = {.r = 42, .g = 25, .b = 85};
+
     // Loop: r g b white
     while (1)
     {
-        ws2812b_face_set_rgb(100, 0, 0);
+        fill_face_buf(red);
+        ws2812b_face_send_buffer(&face_buffer);
         sleep_ms(1000);
 
-        ws2812b_face_set_rgb(0, 100, 0);
+        fill_face_buf(green);
+        ws2812b_face_send_buffer(&face_buffer);
         sleep_ms(1000);
 
-        ws2812b_face_set_rgb(0, 0, 100);
+        fill_face_buf(blue);
+        ws2812b_face_send_buffer(&face_buffer);
         sleep_ms(1000);
 
-        ws2812b_face_set_rgb(30, 30, 30);
+        fill_face_buf(white);
+        ws2812b_face_send_buffer(&face_buffer);
         sleep_ms(1000);
+    }
+}
+
+static void fill_face_buf(wsb2812b_led_value_t value)
+{
+    for (size_t i = 0; i < WS2812B_NUM_LEDS_FACE; i++)
+    {
+        face_buffer.values[i] = value;
     }
 }
