@@ -7,6 +7,9 @@ I did this on Linux. If the project settings are bad for Windows, I'm sorry!
 
 * max7456 is the OSD I think -- text overlay for the video screen inside the head
 * led matrices are all ws2812b
+* The LED channels have min|max brightness limits (out of 255).
+    * Face: 10|100 (max limit for power reasons)
+    * Others: 30|255
 
 # TODOs
 

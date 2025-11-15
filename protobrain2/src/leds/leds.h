@@ -30,6 +30,6 @@ typedef struct
 } led_face_buffer_t;
 
 void leds_init(void);
-void leds_debug_set_channel_to_colour(led_channel_t channel, wsb2812b_led_value_t value);
+void leds_debug_set_channel_to_colour(led_channel_t channel, wsb2812b_led_value_t value, bool flush);
 
 #endif /* #ifndef _LEDS_H_ */

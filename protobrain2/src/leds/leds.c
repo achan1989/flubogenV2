@@ -26,7 +26,7 @@ void leds_init(void)
     ws2812b_init(channel_init, channels, NUM_LED_CHANNELS);
 }
 
-void leds_debug_set_channel_to_colour(led_channel_t channel, wsb2812b_led_value_t value)
+void leds_debug_set_channel_to_colour(led_channel_t channel, wsb2812b_led_value_t value, bool flush)
 {
     ws2812b_channel_t channel_info = channels[channel];
     wsb2812b_led_value_t *buffer = channel_buffers[channel];
@@ -37,5 +37,8 @@ void leds_debug_set_channel_to_colour(led_channel_t channel, wsb2812b_led_value_
     }
 
     ws2812b_send_buffer(&channel_info, buffer);
-    ws2812b_wait_for_idle(&channel_info);
+    if (flush)
+    {
+        ws2812b_wait_for_idle(&channel_info);
+    }
 }
