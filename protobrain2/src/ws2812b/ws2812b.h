@@ -1,9 +1,7 @@
 #ifndef _WS2812B_H_
 #define _WS2812B_H_
 
-
-#define WS2812B_NUM_LEDS_FACE 10
-
+#include <hardware/pio.h>
 
 typedef union
 {
@@ -20,14 +18,23 @@ typedef union
 
 typedef struct
 {
-    wsb2812b_led_value_t values[WS2812B_NUM_LEDS_FACE];
-} ws2812b_face_buffer_t;
+    uint gpio_pin;
+    uint num_leds;
+} ws2812b_channel_init_t;
+
+typedef struct
+{
+    PIO pio_instance;
+    uint sm_instance;
+    uint dma_channel;
+    uint num_leds;
+} ws2812b_channel_t;
 
 
-void ws2812b_init(void);
-void ws2812b_face_set_xgrb(uint32_t xgrb);
-void ws2812b_face_set_rgb(uint8_t r, uint8_t g, uint8_t b);
-void ws2812b_face_wait_for_idle(void);
-void ws2812b_face_send_buffer(ws2812b_face_buffer_t *buffer);
+
+void ws2812b_init(
+    ws2812b_channel_init_t *channel_requests, ws2812b_channel_t *channel_results, uint num_channels);
+void ws2812b_wait_for_idle(const ws2812b_channel_t *channel);
+void ws2812b_send_buffer(const ws2812b_channel_t *channel, const wsb2812b_led_value_t *values);
 
 #endif /* #ifndef _WS2812B_H_ */

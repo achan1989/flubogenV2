@@ -31,16 +31,12 @@
 #include <pico/stdlib.h>
 #include <pico/time.h>
 
-#include "ws2812b/ws2812b.h"
-
-static ws2812b_face_buffer_t face_buffer;
-
-static void fill_face_buf(wsb2812b_led_value_t value);
+#include "leds/leds.h"
 
 int main(void) {
     hard_assert(stdio_init_all());
 
-    ws2812b_init();
+    leds_init();
     sleep_ms(50);
 
     wsb2812b_led_value_t red = {.r = 125, .g = 0, .b = 0};
@@ -51,28 +47,16 @@ int main(void) {
     // Loop: r g b white
     while (1)
     {
-        fill_face_buf(red);
-        ws2812b_face_send_buffer(&face_buffer);
+        leds_debug_set_channel_to_colour(LED_CHANNEL_FACE, red);
         sleep_ms(1000);
 
-        fill_face_buf(green);
-        ws2812b_face_send_buffer(&face_buffer);
+        leds_debug_set_channel_to_colour(LED_CHANNEL_FACE, green);
         sleep_ms(1000);
 
-        fill_face_buf(blue);
-        ws2812b_face_send_buffer(&face_buffer);
+        leds_debug_set_channel_to_colour(LED_CHANNEL_FACE, blue);
         sleep_ms(1000);
 
-        fill_face_buf(white);
-        ws2812b_face_send_buffer(&face_buffer);
+        leds_debug_set_channel_to_colour(LED_CHANNEL_FACE, white);
         sleep_ms(1000);
-    }
-}
-
-static void fill_face_buf(wsb2812b_led_value_t value)
-{
-    for (size_t i = 0; i < WS2812B_NUM_LEDS_FACE; i++)
-    {
-        face_buffer.values[i] = value;
     }
 }

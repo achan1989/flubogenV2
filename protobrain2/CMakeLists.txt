@@ -38,7 +38,7 @@ pico_sdk_init()
 add_executable(protobrain2
 	src/main.c
 	#src/anim.c
-	#src/leds.c
+	src/leds/leds.c
 	#src/osd.c
 	#src/misc.c
 	#src/sd_config.c
