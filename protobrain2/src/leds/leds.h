@@ -1,7 +1,7 @@
 #ifndef _LEDS_H_
 #define _LEDS_H_
 
-#include "ws2812b/ws2812b.h"
+#include "ws2812b.h"
 
 #define NUM_LED_CHANNELS 4
 
