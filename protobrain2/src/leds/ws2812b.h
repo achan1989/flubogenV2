@@ -33,7 +33,8 @@ typedef struct
 
 
 void ws2812b_init(
-    ws2812b_channel_init_t *channel_requests, ws2812b_channel_t *channel_results, uint num_channels);
+    const ws2812b_channel_init_t *channel_requests, ws2812b_channel_t *channel_results,
+    uint num_channels);
 void ws2812b_wait_for_idle(const ws2812b_channel_t *channel);
 void ws2812b_send_buffer(const ws2812b_channel_t *channel, const wsb2812b_led_value_t *values);
 

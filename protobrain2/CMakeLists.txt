@@ -88,6 +88,12 @@ target_link_libraries(protobrain2
 
 add_compile_definitions(PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK=1)
 
+target_compile_options(protobrain2 PRIVATE
+	$<$<COMPILE_LANGUAGE:C>:-Werror>
+	$<$<COMPILE_LANGUAGE:C>:-Wall>
+	$<$<COMPILE_LANGUAGE:C>:-Wextra>
+)
+
 pico_add_extra_outputs(protobrain2)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

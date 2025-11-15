@@ -24,7 +24,8 @@ static void setup_pio(
     uint num_leds);
 
 void ws2812b_init(
-    ws2812b_channel_init_t *channel_requests, ws2812b_channel_t *channel_results, uint num_channels)
+    const ws2812b_channel_init_t *channel_requests, ws2812b_channel_t *channel_results,
+    uint num_channels)
 {
     PIO pio_instance;
     bool need_new_pio = true;
@@ -100,7 +101,7 @@ static void setup_pio(
     int cycles_per_bit = ws2812b_T1 + ws2812b_T2 + ws2812b_T3;
     float div = clock_get_hz(clk_sys) / (BAUD_RATE * cycles_per_bit);
 #ifdef SLOW_LOGIC_ANALYSER
-    #warning WS2812B driver is at 1/8 speed for debugging!
+    #pragma message "Warning: WS2812B driver is at 1/8 speed for debugging!"
     div *= 8;
 #endif
     sm_config_set_clkdiv(&sm_config, div);
