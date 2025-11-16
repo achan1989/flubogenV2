@@ -203,6 +203,7 @@ void startAnimation(uint8_t animationNumber) {
 			f_read(&filAnimation, &colord[0], 3, &br);
 
 			for (uint8_t j = 0; j < 3; j++) {
+				#warning unsafe! gamma needed for power limiting
 				/* TODO: restore the gamma correction functionality. */
 				//colorTable[i].raw[j] = gammaCorrection[colord[j]];
 				colorTable[i].raw[j] = colord[j];
@@ -256,6 +257,7 @@ void updateAnimation() {
 		uint8_t color[3];
 		for (uint16_t i = 0; i < NUM_LEDS_FACE; i++) {
     		f_read(&filAnimation, &color, 3, &br);
+			#warning unsafe! gamma needed for power limiting
 			/* TODO: restore the gamma correction functionality. */
 			//colorBufferFace[i].raw[j] = gammaCorrection[color[j]];
 
