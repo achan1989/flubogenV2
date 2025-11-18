@@ -39,6 +39,7 @@
 		"files.associations": {
 			"*.c": "c",
 			"*.h": "c",
+			"*.inc": "c"
 		}
 	}
 }

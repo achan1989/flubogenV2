@@ -40,6 +40,7 @@ add_executable(protobrain2
 	src/main.c
 	src/leds/leds.c
 	src/leds/ws2812b.c
+	src/fake_fs/fake_fs.c
 )
 
 add_subdirectory(lib/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico/src build)
@@ -62,6 +63,7 @@ target_link_libraries(protobrain2
 # Add the standard include files to the build
 target_include_directories(protobrain2 PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/src
+        ${CMAKE_CURRENT_LIST_DIR}/src/fake_fs
 )
 
 # Add any user requested libraries
@@ -79,7 +81,7 @@ target_link_libraries(protobrain2
 	hardware_uart
 	hardware_xosc
     pico_stdlib
-    no-OS-FatFS-SD-SDIO-SPI-RPi-Pico
+    #no-OS-FatFS-SD-SDIO-SPI-RPi-Pico
         )
 
 add_compile_definitions(PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK=1)
