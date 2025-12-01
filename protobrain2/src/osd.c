@@ -159,11 +159,14 @@ void osd_init(void)
     busWrite(MAX7456_VM0, 0b01001000); // 0b01001000 PAL auto sync, OSD on ---- 0x48
 }
 
-void updateOSD(uint8_t animationNumber)
+void updateOSD(uint16_t ADCAvgBattV, uint8_t animationCurrentNumber, const uint8_t *lastRemoteData)
 {
 #if 1
     /* The code that was in main_old.c when I started to overhaul everything. Seems to be an
      * attempt to port from the old STM32 code to the RP2040. */
+
+    /* Temporary line buffer for OSD prints. */
+    char strBuffer[31] = { 0 };
 
     // printf("MAX7456_VM0: %02X\n", busRead(MAX7456_VM0));
     //  osd_print(2, 1, "DEBUG MODE", 1);
@@ -201,10 +204,10 @@ void updateOSD(uint8_t animationNumber)
     // osd_print(2, 7, strBuffer, 0);
 
     osd_print(1, MAX7456_PAL_ROWS - 3, ANIMATION_NAME[animationCurrentNumber], 0);
-    msSinceBoot = to_ms_since_boot(get_absolute_time());
-    seconds = (msSinceBoot / 1000) % 60;
-    minutes = (msSinceBoot / (1000 * 60)) % 60;
-    hours = (msSinceBoot / (1000 * 60 * 60)) % 60;
+    uint32_t msSinceBoot = to_ms_since_boot(get_absolute_time());
+    uint8_t seconds = (msSinceBoot / 1000) % 60;
+    uint8_t minutes = (msSinceBoot / (1000 * 60)) % 60;
+    uint8_t hours = (msSinceBoot / (1000 * 60 * 60)) % 60;
     sprintf(strBuffer, "%d:%d:%d", hours, minutes, seconds);
     osd_print(20, MAX7456_PAL_ROWS - 2, strBuffer, 0);
 
