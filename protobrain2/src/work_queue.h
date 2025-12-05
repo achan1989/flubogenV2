@@ -14,6 +14,8 @@ typedef enum
     WORK_ITEM_REQUEST_RANDOM_ANIMATION,
     WORK_ITEM_READ_ADC_SENSORS,
     WORK_ITEM_UPDATE_OSD,
+    WORK_ITEM_SET_ANIMATION,
+    WORK_ITEM_LOCK_ANIMATION,
 } work_item_command_t;
 
 typedef struct

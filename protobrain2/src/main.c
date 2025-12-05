@@ -31,6 +31,7 @@
 #include "leds/led_brightness.h"
 #include "leds/leds.h"
 #include "osd.h"
+#include "remote.h"
 #include "work_queue.h"
 
 /** Read the ADC sensors at 100Hz, producing average values at 10Hz. */
@@ -76,6 +77,7 @@ int main(void)
     leds_set_channel_to_colour(LED_CHANNEL_BODY1, logo_colour, false);
 
     osd_init();
+    remote_init();
 
     /* Start the boot animation. */
     hard_assert(animationInit());
