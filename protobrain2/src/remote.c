@@ -33,8 +33,7 @@ void remote_init(void)
 {
     gpio_set_function(GPIO_PIN_TX, UART_FUNCSEL_NUM(REMOTE_UART_INSTANCE, GPIO_PIN_TX));
     gpio_set_function(GPIO_PIN_RX, UART_FUNCSEL_NUM(REMOTE_UART_INSTANCE, GPIO_PIN_RX));
-    uint baud_rate = uart_init(REMOTE_UART_INSTANCE, UART_BAUD_RATE);
-    hard_assert(baud_rate == UART_BAUD_RATE);
+    uart_init(REMOTE_UART_INSTANCE, UART_BAUD_RATE);
 
     irq_set_exclusive_handler(UART_IRQ_NUM(REMOTE_UART_INSTANCE), uart_rx_irq_handler);
     irq_set_enabled(UART_IRQ_NUM(REMOTE_UART_INSTANCE), true);
