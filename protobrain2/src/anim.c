@@ -354,3 +354,8 @@ const char *animation_get_current_name(void)
 	snprintf(cmd_name, 22, "COMMAND ANIMATION %" PRIu8, current_num - 5);
 	return cmd_name;
 }
+
+uint8_t animation_get_current_number(void)
+{
+	return animationCurrentNumber;
+}

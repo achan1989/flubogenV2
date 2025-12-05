@@ -53,6 +53,9 @@ static alarm_id_t random_animation_timer;
 static atomic_bool is_random_animation_timer_running;
 static bool want_random_animation;
 
+static bool force_new_animation;
+static uint8_t forced_animation_number;
+
 static bool face_animation_callback(repeating_timer_t *timer);
 static bool adc_read_callback(repeating_timer_t *timer);
 static bool osd_update_callback(repeating_timer_t *timer);
@@ -102,7 +105,20 @@ int main(void)
         {
         case WORK_ITEM_ANIMATE_FACE_FRAME:
         {
-            bool finished = updateAnimation();
+            /* TODO: the animation logic is getting pretty complicated.
+             * Move it to a separate animation manager with a FSM. */
+            bool finished = force_new_animation || updateAnimation();
+
+            if (force_new_animation)
+            {
+                if (is_random_animation_timer_running)
+                {
+                    cancel_alarm(random_animation_timer);
+                    is_random_animation_timer_running = false;
+                }
+                want_random_animation = false;
+            }
+
             if (finished)
             {
                 cancel_repeating_timer(&face_animation_timer);
@@ -110,7 +126,11 @@ int main(void)
                 uint8_t next_animation = DEFAULT_ANIMATION;
                 bool starting_random = false;
 
-                if (want_random_animation)
+                if (force_new_animation)
+                {
+                    next_animation = forced_animation_number;
+                }
+                else if (want_random_animation)
                 {
                     starting_random = true;
                     want_random_animation = false;
@@ -139,16 +159,22 @@ int main(void)
                         animation_period_ms, face_animation_callback, NULL, &face_animation_timer));
 
                 /* We start the random animation timer if it's not already running and we didn't
-                 * just start a random animation. In practice this means we start the timer at the
-                 * end of the boot animation, and then at the end of each random animation.
+                 * just start a random or forced animation. In practice this means we start the
+                 * timer at the end of the boot animation, and then at the end of each random
+                 * animation.
                  * We do it like this so the time between random animations is correct if any of
                  * the animations are long (which they are). */
-                if (!starting_random && !is_random_animation_timer_running)
+                if (!starting_random && !force_new_animation && !is_random_animation_timer_running)
                 {
                     random_animation_timer = add_alarm_in_ms(
                         RANDOM_ANIMATION_PERIOD_MS, random_animation_callback, NULL, true);
                     hard_assert(random_animation_timer > 0);
                     is_random_animation_timer_running = true;
+                }
+
+                if (force_new_animation)
+                {
+                    force_new_animation = false;
                 }
             }
         }
@@ -183,6 +209,36 @@ int main(void)
                 ms_since_boot,
                 animation_get_current_name(),
                 fake_remote_data);
+        }
+        break;
+
+        case WORK_ITEM_SET_ANIMATION:
+        {
+            /* Slightly misleading name.
+             * Unlock the animations and ensure the stated animation is playing.
+             * Don't restart the animation if we're already playing it! */
+            animationSetLocked(false);
+            uint8_t desired_animation_number = work.data;
+            if (desired_animation_number != animation_get_current_number())
+            {
+                force_new_animation = true;
+                force_new_animation = desired_animation_number;
+            }
+        }
+        break;
+
+        case WORK_ITEM_LOCK_ANIMATION:
+        {
+            /* Slightly misleading name.
+             * Lock the animations and ensure the stated animation is playing.
+             * Don't restart the animation if we're already playing it! */
+            animationSetLocked(true);
+            uint8_t desired_animation_number = work.data;
+            if (desired_animation_number != animation_get_current_number())
+            {
+                force_new_animation = true;
+                force_new_animation = desired_animation_number;
+            }
         }
         break;
 
