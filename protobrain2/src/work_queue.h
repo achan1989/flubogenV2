@@ -14,6 +14,12 @@ typedef enum
     WORK_ITEM_REQUEST_RANDOM_ANIMATION,
     WORK_ITEM_READ_ADC_SENSORS,
     WORK_ITEM_UPDATE_OSD,
+} work_item_command_t;
+
+typedef struct
+{
+    work_item_command_t command;
+    uint8_t data;
 } work_item_t;
 
 /**
@@ -24,11 +30,26 @@ void work_queue_init(void);
 /**
  * Add a work item.
  *
+ * The \p command is specified, and the `data` is left undefined.
+ * Use this when the command has no data associated with it.
+ *
  * Safe to call from interrupt handlers.
  *
  * @param[in] item Work item
  */
-void work_queue_add(work_item_t item);
+void work_queue_add(work_item_command_t command);
+
+/**
+ * Add a work item.
+ *
+ * The full work \p item is specified.
+ * Use this when the command has data associated with it.
+ *
+ * Safe to call from interrupt handlers.
+ *
+ * @param[in] item Work item
+ */
+void work_queue_add_with_data(work_item_t item);
 
 /**
  * Remove a work item.

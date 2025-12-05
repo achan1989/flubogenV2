@@ -17,7 +17,16 @@ void work_queue_init(void)
     queue_init(&queue, sizeof(work_item_t), WORK_QUEUE_CAPACITY);
 }
 
-void work_queue_add(work_item_t item)
+void work_queue_add(work_item_command_t command)
+{
+    work_item_t item = {
+        .command = command,
+    };
+    bool added = queue_try_add(&queue, &item);
+    hard_assert(added);
+}
+
+void work_queue_add_with_data(work_item_t item)
 {
     bool added = queue_try_add(&queue, &item);
     hard_assert(added);

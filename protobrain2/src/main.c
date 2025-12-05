@@ -96,7 +96,7 @@ int main(void)
     while (true)
     {
         work_item_t work = work_queue_remove_blocking();
-        switch (work)
+        switch (work.command)
         {
         case WORK_ITEM_ANIMATE_FACE_FRAME:
         {
