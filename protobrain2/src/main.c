@@ -18,8 +18,10 @@
 //   Red 0.47  Green 0.28  Blue 1.0
 // I won't do the brightness equalisation now, though.
 
+#include <inttypes.h>
 #include <stdatomic.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <pico/assert.h>
@@ -30,6 +32,7 @@
 #include "anim.h"
 #include "leds/led_brightness.h"
 #include "leds/leds.h"
+#include "misc.h"
 #include "osd.h"
 #include "remote.h"
 #include "work_queue.h"
@@ -64,6 +67,9 @@ static int64_t random_animation_callback(alarm_id_t id, void *user_data);
 int main(void)
 {
     hard_assert(stdio_init_all());
+    //enablePrintDebug(true);
+    sleep_ms(3000);
+    printf("Booting!\n");
 
     work_queue_init();
 
@@ -115,6 +121,7 @@ int main(void)
                 {
                     cancel_alarm(random_animation_timer);
                     is_random_animation_timer_running = false;
+                    printf("Cancelled random animation timer.\n");
                 }
                 want_random_animation = false;
             }
@@ -153,6 +160,7 @@ int main(void)
                     }
                 }
 
+                printf("Starting new animation %" PRIu8 "\n", next_animation);
                 animation_period_ms = startAnimation(next_animation);
                 hard_assert(
                     add_repeating_timer_ms(
@@ -166,6 +174,7 @@ int main(void)
                  * the animations are long (which they are). */
                 if (!starting_random && !force_new_animation && !is_random_animation_timer_running)
                 {
+                    printf("Starting random animation timer.\n");
                     random_animation_timer = add_alarm_in_ms(
                         RANDOM_ANIMATION_PERIOD_MS, random_animation_callback, NULL, true);
                     hard_assert(random_animation_timer > 0);
@@ -181,6 +190,7 @@ int main(void)
         break;
 
         case WORK_ITEM_REQUEST_RANDOM_ANIMATION:
+            printf("Random anim timer triggered.\n");
             want_random_animation = true;
             break;
 
@@ -219,10 +229,16 @@ int main(void)
              * Don't restart the animation if we're already playing it! */
             animationSetLocked(false);
             uint8_t desired_animation_number = work.data;
+            printf("From remote: set animation %" PRIu8 "\n", desired_animation_number);
             if (desired_animation_number != animation_get_current_number())
             {
+                printf("Will force switch to new animation.\n");
                 force_new_animation = true;
                 force_new_animation = desired_animation_number;
+            }
+            else
+            {
+                printf("Ignoring, we're already playing it.\n");
             }
         }
         break;
@@ -234,10 +250,16 @@ int main(void)
              * Don't restart the animation if we're already playing it! */
             animationSetLocked(true);
             uint8_t desired_animation_number = work.data;
+            printf("From remote: lock animation %" PRIu8 "\n", desired_animation_number);
             if (desired_animation_number != animation_get_current_number())
             {
+                printf("Will force switch to new animation.\n");
                 force_new_animation = true;
                 force_new_animation = desired_animation_number;
+            }
+            else
+            {
+                printf("Ignoring, we're already playing it.\n");
             }
         }
         break;
