@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include <hardware/gpio.h>
 #include <hardware/irq.h>
@@ -27,7 +28,9 @@
 #define COMMAND_SET_ANIMATION 0
 #define COMMAND_LOCK_ANIMATION 1
 
+#if 0
 static void uart_rx_irq_handler(void);
+#endif
 
 void remote_init(void)
 {
@@ -35,13 +38,23 @@ void remote_init(void)
     gpio_set_function(GPIO_PIN_RX, UART_FUNCSEL_NUM(REMOTE_UART_INSTANCE, GPIO_PIN_RX));
     uart_init(REMOTE_UART_INSTANCE, UART_BAUD_RATE);
 
+    while (true)
+    {
+        uint8_t byte;
+        uart_read_blocking(REMOTE_UART_INSTANCE, &byte, 1);
+        printf("Rx 0x%02x\n", byte);
+    }
+
+#if 0
     irq_set_exclusive_handler(UART_IRQ_NUM(REMOTE_UART_INSTANCE), uart_rx_irq_handler);
     irq_set_enabled(UART_IRQ_NUM(REMOTE_UART_INSTANCE), true);
     // uart_set_irqs_enabled(REMOTE_UART_INSTANCE, true, false);
     /* Enable the read timeout interrupt only. */
     uart_get_hw(REMOTE_UART_INSTANCE)->imsc = UART_UARTIMSC_RTIM_LSB;
+#endif
 }
 
+#if 0
 static void uart_rx_irq_handler(void)
 {
     /* The interrupt is triggered only on RX timeout.
@@ -112,3 +125,4 @@ static void uart_rx_irq_handler(void)
     uart_get_hw(REMOTE_UART_INSTANCE)->icr = UART_UARTICR_BITS;
     irq_set_enabled(UART_IRQ_NUM(REMOTE_UART_INSTANCE), true);
 }
+#endif
