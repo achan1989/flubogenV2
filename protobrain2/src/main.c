@@ -88,7 +88,7 @@ int main(void)
     sleep_ms(1);
 
     /* For now, just set the cheek and body logos to a fixed colour. */
-    logo_colour = (ws2812b_led_value_t){.r = 0, .g = 0, .b = led_brightness_get_logo_value()};
+    logo_colour = (ws2812b_led_value_t){.r = led_brightness_get_logo_value(), .g = 0, .b = 0};
     leds_set_channel_to_colour(LED_CHANNEL_CHEEK, logo_colour, false);
     leds_set_channel_to_colour(LED_CHANNEL_BODY0, logo_colour, false);
     leds_set_channel_to_colour(LED_CHANNEL_BODY1, logo_colour, false);
@@ -153,7 +153,7 @@ static void do_work(work_item_t work)
                 led_brightness_update(adc_sensors_get_averages().brightness);
 
                 /* Logo auto-brightness adjustment. Still a fixed colour. */
-                logo_colour.b = led_brightness_get_logo_value();
+                logo_colour.r = led_brightness_get_logo_value();
             }
 
             /* Even when we're locked we still write to the logos, re-applying the same unchanged
