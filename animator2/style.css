@@ -1,0 +1,29 @@
+body {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+button {
+  color: #ffffff;
+}
+
+header nav {
+  background-color: #45649e;
+}
+
+header nav button {
+  background-color: #585858;
+  border: 1px solid #cccccc;
+}
+
+header nav button.active {
+  background-color: #dd5858;
+}
+
+#tabContentWrapper .tabContent {
+  display: none;
+}
+
+#tabContentWrapper .tabContent.active {
+  display: block;
+}
