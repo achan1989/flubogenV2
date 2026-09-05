@@ -1,15 +1,11 @@
 function makeNavTabsClickable() {
   const tabs = document.getElementById("navTabBar").getElementsByClassName("tab");
   for (const tab of tabs) {
-    tab.addEventListener("click", (event) => onTabClicked(event, tab));
+    tab.addEventListener("click", (event) => onNavTabClicked(event, tab));
   }
 }
 
-function openDefaultTab() {
-  document.getElementById("defaultTabButton").click();
-}
-
-function onTabClicked(event, clickedTab) {
+function onNavTabClicked(event, clickedTab) {
   // Make all tabs look inactive except the clicked one.
   const tabs = document.getElementById("navTabBar").getElementsByClassName("tab");
   for (const tab of tabs) {
@@ -34,4 +30,3 @@ function onTabClicked(event, clickedTab) {
 
 
 makeNavTabsClickable();
-openDefaultTab();
