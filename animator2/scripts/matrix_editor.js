@@ -5,6 +5,10 @@ const DEFAULT_FACE_CUTOUT_ROW_END = 2;
 const DEFAULT_FACE_CUTOUT_COL_BEGIN = 10;
 const DEFAULT_FACE_CUTOUT_COL_END = 25;
 
+const DEFAULT_LOGO_N_ROWS = 7;
+const DEFAULT_LOGO_N_COLS = 7;
+const DEFAULT_LOGO_PRESENT_LEDS = [[0,3], [1,5], [3,6], [5,5], [6,3], [5,1], [3,0], [1,1], [3,3]];
+
 const DEFAULT_LED_SIZE = 25;
 const MIN_LED_SIZE = 10;
 const DEFAULT_LED_GAP = 4;
@@ -148,11 +152,22 @@ export class MatrixEditor {
    */
   loadDefaultFace() {
     this.setMatrixDimensions(DEFAULT_FACE_N_ROWS, DEFAULT_FACE_N_COLS);
-    this.enableAllLeds();
+    this.setLedPresenceAll(true);
     for (let rowIdx = DEFAULT_FACE_CUTOUT_ROW_BEGIN; rowIdx <= DEFAULT_FACE_CUTOUT_ROW_END; rowIdx++) {
       for (let colIdx = DEFAULT_FACE_CUTOUT_COL_BEGIN; colIdx <= DEFAULT_FACE_CUTOUT_COL_END; colIdx++) {
         this.setLedPresence(rowIdx, colIdx, false);
       }
+    }
+  }
+
+  /**
+   * Load the default logo matrix.
+   */
+  loadDefaultLogo() {
+    this.setMatrixDimensions(DEFAULT_LOGO_N_ROWS, DEFAULT_LOGO_N_COLS);
+    this.setLedPresenceAll(false);
+    for (const [row, col] of DEFAULT_LOGO_PRESENT_LEDS) {
+      this.setLedPresence(row, col, true);
     }
   }
 
@@ -207,11 +222,12 @@ export class MatrixEditor {
   }
 
   /**
-   * Set all LEDs in the matrix to "present".
+   * Set the presence of all LEDs in the matrix.
+   * @param {boolean} present
    */
-  enableAllLeds() {
+  setLedPresenceAll(presence) {
     for (const row of this.#leds) {
-      row.fill(true);
+      row.fill(presence);
     }
   }
 

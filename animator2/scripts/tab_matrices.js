@@ -1,17 +1,31 @@
 import {MatrixEditor} from "./matrix_editor.js";
 
 
-let editor;
+/** @type {HTMLElement} */
+let container;
+let editors;
 let resizeObserver;
 
 
 function init() {
-  const container = document.querySelector("#matrices_default");
-  const maxWidth = Math.round(container.clientWidth * 0.95);
+  container = document.querySelector("#matrices_container");
+  editors = [];
 
-  const canvas = document.querySelector("#matrices_canvas");
-  editor = new MatrixEditor(canvas, maxWidth);
-  editor.loadDefaultFace();
+  if (isDefault()) {
+    const faceEditor = appendEditor();
+    faceEditor.loadDefaultFace();
+
+    const cheekEditor = appendEditor();
+    cheekEditor.loadDefaultLogo();
+
+    const body0Editor = appendEditor();
+    body0Editor.loadDefaultLogo();
+
+    const body1Editor = appendEditor();
+    body1Editor.loadDefaultLogo();
+  } else {
+    console.warn("Unimplemented: custom matrices");
+  }
 
   resizeObserver = new ResizeObserver(onContainerResized);
   resizeObserver.observe(container);
@@ -19,7 +33,24 @@ function init() {
 
 function onContainerResized(entries, observer) {
   const maxWidth = entries[0].target.clientWidth;
-  editor.setCanvasWidth(maxWidth);
+  for (const editor of editors) {
+    editor.setCanvasWidth(maxWidth);
+  }
+}
+
+function isDefault() {
+  return document.querySelector("input[name=matrices_configurationChoice]:checked").value === "default";
+}
+
+function appendEditor() {
+  const canvas = document.createElement("canvas");
+  container.appendChild(canvas);
+  container.appendChild(document.createElement("hr"));
+
+  const maxWidth = Math.round(container.clientWidth);
+  const editor = new MatrixEditor(canvas, maxWidth);
+  editors.push(editor);
+  return editor;
 }
 
 

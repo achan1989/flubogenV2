@@ -1,11 +1,10 @@
 <fieldset>
   <legend>Choose the LED matrix configuration:</legend>
-  <input type="radio" name="matrices_configurationChoice" value="default" id="matrices_configurationChoiceDefault">
+  <input type="radio" name="matrices_configurationChoice" value="default" id="matrices_configurationChoiceDefault" checked>
   <label for="matrices_configurationChoiceDefault">Default</label>
   <input type="radio" name="matrices_configurationChoice" value="custom" id="matrices_configurationChoiceCustom" disabled="true">
   <label for="matricesCustomChoiceCustom">Custom (not implemented yet)</label>
 </fieldset>
 
-<div id="matrices_default">
-  <canvas id="matrices_canvas">Shows the layout of the LED matrices</canvas>
+<div id="matrices_container">
 </div>
