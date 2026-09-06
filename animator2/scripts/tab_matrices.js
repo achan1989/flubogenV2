@@ -11,6 +11,7 @@ function init() {
 
   const canvas = document.querySelector("#matrices_canvas");
   editor = new MatrixEditor(canvas, maxWidth);
+  editor.loadDefaultFace();
 
   resizeObserver = new ResizeObserver(onContainerResized);
   resizeObserver.observe(container);
@@ -18,7 +19,7 @@ function init() {
 
 function onContainerResized(entries, observer) {
   const maxWidth = entries[0].target.clientWidth;
-  editor.resizeCanvas(maxWidth);
+  editor.setCanvasWidth(maxWidth);
 }
 
 
