@@ -1,16 +1,6 @@
 import {LedVis, MatrixCanvas} from "./matrix_canvas.js";
+import {MatrixDefinition} from "./matrix_types.js"
 
-
-const DEFAULT_FACE_N_ROWS = 10;
-const DEFAULT_FACE_N_COLS = 36;
-const DEFAULT_FACE_CUTOUT_ROW_BEGIN = 0;
-const DEFAULT_FACE_CUTOUT_ROW_END = 2;
-const DEFAULT_FACE_CUTOUT_COL_BEGIN = 10;
-const DEFAULT_FACE_CUTOUT_COL_END = 25;
-
-const DEFAULT_LOGO_N_ROWS = 7;
-const DEFAULT_LOGO_N_COLS = 7;
-const DEFAULT_LOGO_PRESENT_LEDS = [[0,3], [1,5], [3,6], [5,5], [6,3], [5,1], [3,0], [1,1], [3,3]];
 
 const LED_GAP_COLOUR = "#666666";
 const LED_PRESENT_COLOUR = "#00ad00";
@@ -31,52 +21,27 @@ export class MatrixEditor {
   /** @type {number} */
   #maxWidth;
 
-  /**
-   * The shape of the LED matrix, and whether each LED is present (bool).
-   * Access as `leds[row][column]`.
-   * @type {boolean[][]}
-   */
-  #leds;
+  /** @type {MatrixDefinition} */
+  #definition;
 
 
   /**
-   * Create a new MatrixEditor. Starts empty.
+   * Create a new MatrixEditor.
    * @param {HTMLCanvasElement} canvasElement
    * @param {number} maxWidth The max width that the editor can draw into.
+   * @param {MatrixDefinition} [definition] Define the matrix shape and connectivity. If not
+   * provided, start with an empty matrix.
    */
-  constructor(canvasElement, maxWidth) {
+  constructor(canvasElement, maxWidth, definition) {
     this.#canvasElement = canvasElement;
     this.#matrixCanvas = new MatrixCanvas(canvasElement)
 
-    this.#leds = [];
+    this.#definition = definition;
+    if (this.#definition === undefined) {
+      this.#definition = new MatrixDefinition();
+    }
 
     this.setMaxWidth(maxWidth);
-  }
-
-  /**
-   * Load the default face matrix.
-   */
-  loadDefaultFace() {
-    this.setMatrixDimensions(DEFAULT_FACE_N_ROWS, DEFAULT_FACE_N_COLS);
-    this.#setLedPresenceAll(true);
-    for (let rowIdx = DEFAULT_FACE_CUTOUT_ROW_BEGIN; rowIdx <= DEFAULT_FACE_CUTOUT_ROW_END; rowIdx++) {
-      for (let colIdx = DEFAULT_FACE_CUTOUT_COL_BEGIN; colIdx <= DEFAULT_FACE_CUTOUT_COL_END; colIdx++) {
-        this.#setLedPresence(rowIdx, colIdx, false);
-      }
-    }
-    this.draw();
-  }
-
-  /**
-   * Load the default logo matrix.
-   */
-  loadDefaultLogo() {
-    this.setMatrixDimensions(DEFAULT_LOGO_N_ROWS, DEFAULT_LOGO_N_COLS);
-    this.#setLedPresenceAll(false);
-    for (const [row, col] of DEFAULT_LOGO_PRESENT_LEDS) {
-      this.#setLedPresence(row, col, true);
-    }
-    this.draw();
   }
 
   /**
@@ -96,7 +61,7 @@ export class MatrixEditor {
     if (this.#maxWidth === 0) return;
 
     // Represent our matrix in a drawable form.
-    const matrixVis = this.#leds.map( (row) => {
+    const matrixVis = this.#definition.leds.map( (row) => {
       return row.map( (present) => {
         const colour = present ? LED_PRESENT_COLOUR : LED_NOT_PRESENT_COLOUR;
         return new LedVis(present, colour);
@@ -111,8 +76,8 @@ export class MatrixEditor {
    * @returns {number[]} [number of rows, number of columns]
    */
   getMatrixDimensions() {
-    const nRows = this.#leds.length;
-    let nCols = this.#leds[0]?.length;
+    const nRows = this.#definition.leds.length;
+    let nCols = this.#definition.leds[0]?.length;
     nCols ??= 0;
     return [nRows, nCols];
   }
@@ -123,11 +88,11 @@ export class MatrixEditor {
    * @param {number} nCols
    */
   setMatrixDimensions(nRows, nCols) {
-    const currentRows = this.#leds.length;
+    const currentRows = this.#definition.leds.length;
 
     // When shrinking, rows are automatically discarded.
     if (nRows < currentRows) {
-      this.#leds.length = nRows;
+      this.#definition.leds.length = nRows;
     }
     // When growing, we must add a row of LEDs, enabled by default.
     if (nRows > currentRows) {
@@ -136,11 +101,11 @@ export class MatrixEditor {
         const newRow = [];
         newRow.length = nCols;
         newRow.fill(true);
-        this.#leds.push(newRow);
+        this.#definition.leds.push(newRow);
       }
     }
 
-    for (const row of this.#leds) {
+    for (const row of this.#definition.leds) {
       const currentCols = row.length;
       // When shrinking, columns are automatically discarded.
       if (nCols < currentCols) {
@@ -159,7 +124,7 @@ export class MatrixEditor {
    * @param {boolean} present
    */
   #setLedPresenceAll(present) {
-    for (const row of this.#leds) {
+    for (const row of this.#definition.leds) {
       row.fill(present);
     }
   }
@@ -178,6 +143,6 @@ export class MatrixEditor {
       return;
     }
 
-    this.#leds[row][col] = present;
+    this.#definition.leds[row][col] = present;
   }
 }
