@@ -34,7 +34,7 @@ function init() {
 function onContainerResized(entries, observer) {
   const maxWidth = entries[0].target.clientWidth;
   for (const editor of editors) {
-    editor.setCanvasWidth(maxWidth);
+    editor.setMaxWidth(maxWidth);
   }
 }
 

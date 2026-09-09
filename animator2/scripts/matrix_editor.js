@@ -1,3 +1,6 @@
+import {LedVis, MatrixCanvas} from "./matrix_canvas.js";
+
+
 const DEFAULT_FACE_N_ROWS = 10;
 const DEFAULT_FACE_N_COLS = 36;
 const DEFAULT_FACE_CUTOUT_ROW_BEGIN = 0;
@@ -8,11 +11,6 @@ const DEFAULT_FACE_CUTOUT_COL_END = 25;
 const DEFAULT_LOGO_N_ROWS = 7;
 const DEFAULT_LOGO_N_COLS = 7;
 const DEFAULT_LOGO_PRESENT_LEDS = [[0,3], [1,5], [3,6], [5,5], [6,3], [5,1], [3,0], [1,1], [3,3]];
-
-const DEFAULT_LED_SIZE = 25;
-const MIN_LED_SIZE = 10;
-const DEFAULT_LED_GAP = 4;
-const MIN_LED_GAP = 2;
 
 const LED_GAP_COLOUR = "#666666";
 const LED_PRESENT_COLOUR = "#00ad00";
@@ -27,124 +25,32 @@ const LED_NOT_PRESENT_COLOUR = "#000000";
  */
 export class MatrixEditor {
   /** @type {HTMLCanvasElement} */
-  #canvas;
-  /** @type {CanvasRenderingContext2D} */
-  #ctx;
-  /** The max width that the editor can draw into. */
+  #canvasElement;
+  /** @type {MatrixCanvas} */
+  #matrixCanvas;
+  /** @type {number} */
   #maxWidth;
-
-  #drawLedSize;
-  #drawLedGap;
 
   /**
    * The shape of the LED matrix, and whether each LED is present (bool).
    * Access as `leds[row][column]`.
-   * @type {Array[Array[]]}
+   * @type {boolean[][]}
    */
   #leds;
 
 
   /**
    * Create a new MatrixEditor. Starts empty.
-   * @param {HTMLCanvasElement} canvas The canvas element.
-   * @param {number} width The max width that the editor can draw into.
+   * @param {HTMLCanvasElement} canvasElement
+   * @param {number} maxWidth The max width that the editor can draw into.
    */
-  constructor(canvas, width) {
-    this.#canvas = canvas;
-    this.#ctx = canvas.getContext("2d", {alpha: false});
+  constructor(canvasElement, maxWidth) {
+    this.#canvasElement = canvasElement;
+    this.#matrixCanvas = new MatrixCanvas(canvasElement)
 
     this.#leds = [];
 
-    this.setCanvasWidth(width);
-  }
-
-  /**
-   * @param {number} width The max width that the editor can draw into.
-   */
-  setCanvasWidth(width) {
-    width = Math.floor(width);
-    this.#maxWidth = width;
-    this.#updateLayout();
-  }
-
-  /**
-   * Update the drawing after changing the editor size or the LED matrix dimensions.
-   */
-  #updateLayout() {
-    this.#drawLedSize = DEFAULT_LED_SIZE;
-    this.#drawLedGap = DEFAULT_LED_GAP;
-
-    const [nRows, nCols] = this.getMatrixDimensions();
-    if (nRows === 0 || nCols === 0) return;
-
-    let [drawWidth, drawHeight] = this.#getDrawDimensions();
-    let excess = drawWidth - this.#maxWidth;
-    let excessPerLed = excess / nCols;
-
-    if (excess > 0) {
-      // If the LEDs need to be drawn very small then shrink the gap between LEDs.
-      if (excessPerLed > ((DEFAULT_LED_SIZE - MIN_LED_SIZE) / 2)) {
-        this.#drawLedGap = MIN_LED_GAP;
-        [drawWidth, drawHeight] = this.#getDrawDimensions();
-        excess = drawWidth - this.#maxWidth;
-        excessPerLed = excess / nCols;
-      }
-
-      let newLedSize = this.#drawLedSize - Math.ceil(excessPerLed);
-      // We'll only draw the LEDs so small.
-      if (newLedSize < MIN_LED_SIZE) {
-        newLedSize = MIN_LED_SIZE;
-      }
-      this.#drawLedSize = newLedSize;
-      [drawWidth, drawHeight] = this.#getDrawDimensions();
-    }
-
-    console.debug(`updateLayout() drawLedSize=${this.#drawLedSize} drawLedGap=${this.#drawLedGap} drawWidth=${drawWidth} drawHeight=${drawHeight}`);
-    this.#canvas.width = drawWidth;
-    this.#canvas.height = drawHeight;
-    this.draw();
-  }
-
-  /**
-   * The dimensions of the drawing, using the current #drawLedSize and #drawLedGap.
-   * @returns {number[]} [width, height]
-   */
-  #getDrawDimensions() {
-    const [nRows, nCols] = this.getMatrixDimensions();
-    const width = (nCols * this.#drawLedSize) + ((nCols+1) * this.#drawLedGap);
-    const height = (nRows * this.#drawLedSize) + ((nRows+1) * this.#drawLedGap);
-    return [width, height];
-  }
-
-  /**
-   * Draw the main matrix editor canvas.
-   */
-  draw() {
-    const [nRows, nCols] = this.getMatrixDimensions();
-    if (nRows === 0 || nCols === 0) return;
-    if (this.#maxWidth === 0) return;
-
-    // Draw the gaps between LEDs. This is just one big background rectangle.
-    const [gapDrawWidth, gapDrawHeight] = this.#getDrawDimensions();
-    this.#ctx.fillStyle = LED_GAP_COLOUR;
-    this.#ctx.fillRect(0, 0, gapDrawWidth, gapDrawHeight);
-
-    // Now each LED individually.
-    for (let rowIdx = 0; rowIdx < nRows; rowIdx++) {
-      const row = this.#leds[rowIdx];
-      for (let colIdx = 0; colIdx < nCols; colIdx++) {
-        const ledPresent = row[colIdx];
-        if (ledPresent) {
-          this.#ctx.fillStyle = LED_PRESENT_COLOUR;
-        } else {
-          this.#ctx.fillStyle = LED_NOT_PRESENT_COLOUR;
-        }
-
-        const x = this.#drawLedGap + (colIdx * (this.#drawLedGap + this.#drawLedSize));
-        const y = this.#drawLedGap + (rowIdx * (this.#drawLedGap + this.#drawLedSize));
-        this.#ctx.fillRect(x, y, this.#drawLedSize, this.#drawLedSize);
-      }
-    }
+    this.setMaxWidth(maxWidth);
   }
 
   /**
@@ -152,12 +58,13 @@ export class MatrixEditor {
    */
   loadDefaultFace() {
     this.setMatrixDimensions(DEFAULT_FACE_N_ROWS, DEFAULT_FACE_N_COLS);
-    this.setLedPresenceAll(true);
+    this.#setLedPresenceAll(true);
     for (let rowIdx = DEFAULT_FACE_CUTOUT_ROW_BEGIN; rowIdx <= DEFAULT_FACE_CUTOUT_ROW_END; rowIdx++) {
       for (let colIdx = DEFAULT_FACE_CUTOUT_COL_BEGIN; colIdx <= DEFAULT_FACE_CUTOUT_COL_END; colIdx++) {
-        this.setLedPresence(rowIdx, colIdx, false);
+        this.#setLedPresence(rowIdx, colIdx, false);
       }
     }
+    this.draw();
   }
 
   /**
@@ -165,10 +72,38 @@ export class MatrixEditor {
    */
   loadDefaultLogo() {
     this.setMatrixDimensions(DEFAULT_LOGO_N_ROWS, DEFAULT_LOGO_N_COLS);
-    this.setLedPresenceAll(false);
+    this.#setLedPresenceAll(false);
     for (const [row, col] of DEFAULT_LOGO_PRESENT_LEDS) {
-      this.setLedPresence(row, col, true);
+      this.#setLedPresence(row, col, true);
     }
+    this.draw();
+  }
+
+  /**
+   * @param {number} maxWidth The max width that the editor can draw into.
+   */
+  setMaxWidth(maxWidth) {
+    this.#maxWidth = maxWidth;
+    this.draw();
+  }
+
+  /**
+   * Draw the main matrix visualisation.
+   */
+  draw() {
+    const [nRows, nCols] = this.getMatrixDimensions();
+    if (nRows == 0 || nCols == 0) return;
+    if (this.#maxWidth === 0) return;
+
+    // Represent our matrix in a drawable form.
+    const matrixVis = this.#leds.map( (row) => {
+      return row.map( (present) => {
+        const colour = present ? LED_PRESENT_COLOUR : LED_NOT_PRESENT_COLOUR;
+        return new LedVis(present, colour);
+      })
+    });
+
+    this.#matrixCanvas.draw(matrixVis, this.#maxWidth, LED_GAP_COLOUR);
   }
 
   /**
@@ -214,20 +149,18 @@ export class MatrixEditor {
       // When growing, we must add LEDs, enabled by default.
       if (nCols > currentCols) {
         row.length = nCols;
-        row.fill(true, currentCols);
+        row.fill(true);
       }
     }
-
-    this.#updateLayout();
   }
 
   /**
    * Set the presence of all LEDs in the matrix.
    * @param {boolean} present
    */
-  setLedPresenceAll(presence) {
+  #setLedPresenceAll(present) {
     for (const row of this.#leds) {
-      row.fill(presence);
+      row.fill(present);
     }
   }
 
@@ -237,7 +170,7 @@ export class MatrixEditor {
    * @param {number} col
    * @param {boolean} present
    */
-  setLedPresence(row, col, present) {
+  #setLedPresence(row, col, present) {
     const [nRows, nCols] = this.getMatrixDimensions();
 
     if (row < 0 || row >= nRows || col < 0 || col >= nCols) {
