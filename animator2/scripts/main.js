@@ -1,3 +1,4 @@
+import * as AppState from "./app_state.js";
 import * as TabMatrices from "./tab_matrices.js";
 
 
@@ -85,4 +86,5 @@ function onNavTabClicked(event, clickedTab) {
 }
 
 
+AppState.initNewProject();
 await loadUi();
