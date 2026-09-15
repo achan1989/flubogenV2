@@ -35,7 +35,7 @@ async function loadTab(destination, url, initFn) {
   const response = await fetch(url);
   if (!response.ok) {
     destination.innerHTML = "<p>Loading failed!</p>";
-    throw new Error("Fetch of ${url} failed: ${response.status}");
+    throw new Error(`Fetch of ${url} failed: ${response.status}`);
   }
 
   const text = await response.text();
