@@ -1,4 +1,5 @@
 import * as AppState from "./app_state.js";
+import * as TabAnimations from "./tab_animations.js";
 import * as TabMatrices from "./tab_matrices.js";
 
 
@@ -8,7 +9,8 @@ import * as TabMatrices from "./tab_matrices.js";
  */
 async function loadUi() {
   const toLoad = [
-    ["tabContent_matrices", "matrices.html", TabMatrices.init]
+    ["tabContent_matrices", "matrices.html", TabMatrices.init],
+    ["tabContent_animations", "animations.html", TabAnimations.init],
   ];
 
   const loadPromises = [];
