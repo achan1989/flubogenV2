@@ -57,7 +57,7 @@ export class AnimationCollection {
     console.assert(idx < list.length);
     list.splice(idx, 1);
 
-    this.resolveCurrentlyEditing();
+    this.resolveCurrentlyEditing(kind, idx);
 
     console.debug(`AnimationCollection changed (remove ${kind} ${idx})`);
     document.dispatchEvent(animationCollectionChangedEvent);
@@ -125,26 +125,37 @@ export class AnimationCollection {
   }
 
   /**
-   * On list changes, currentlyEditing can become stale or invalid. Pick a new value if necessary.
+   * When an animation is removed from a list, currentlyEditing can become stale or invalid.
+   * Pick a new value if necessary.
+   * @param {*} removedKind
+   * @param {*} removedIdx
    */
-  resolveCurrentlyEditing() {
+  resolveCurrentlyEditing(removedKind, removedIdx) {
+    console.assert(removedKind !== AnimationKind.STARTUP);
+    console.assert(removedKind !== AnimationKind.IDLE);
     const [currentKind, currentIdx] = this.currentlyEditing;
-    if (currentKind === AnimationKind.STARTUP || currentKind === AnimationKind.IDLE) return;
+    if (currentKind !== removedKind) return;
 
     const theList = this.listForKind(currentKind);
 
-    // If there are no more left then go to the startup animation.
     if (theList.length == 0) {
-      console.debug("Resolve delete, none left, choose startup");
+      console.debug("Resolve, none left, choose startup");
       this.currentlyEditing = [AnimationKind.STARTUP, null];
     }
-    else
-    {
-      // Prefer to keep the same index. If this isn't possible it's because we deleted the last
-      // one in the list. Select the new last one.
-      if (currentIdx >= theList.length) {
-        console.debug("Resolve delete, deleted last");
+    else if (removedIdx < currentIdx) {
+      console.debug("Resolve, removed before, decrement");
+      this.currentlyEditing = [currentKind, currentIdx - 1];
+    }
+    else if (removedIdx > currentIdx) {
+      console.debug("Resolve, removed after, noop");
+    }
+    else if (removedIdx === currentIdx) {
+      if (removedIdx >= theList.length) {
+        console.debug("Resolve, deleted last, use new last");
         this.currentlyEditing = [currentKind, theList.length - 1];
+      }
+      else {
+        console.debug("Resolve, deleted current, keep index");
       }
     }
   }
