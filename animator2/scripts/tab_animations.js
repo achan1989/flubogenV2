@@ -75,8 +75,14 @@ function makeSelectorListItem(name, kind, idx) {
         "button",
         { eventListener: { click: () => AppState.animations().delete(kind, idx) } },
         "Delete"),
-      createElement("button", {}, "Swap with startup"),
-      createElement("button", {}, "Swap with idle"),
+      createElement(
+        "button",
+        { eventListener: { click: () => AppState.animations().swapWithStartup(kind, idx) } },
+        "Swap with startup"),
+      createElement(
+        "button",
+        { eventListener: { click: () => AppState.animations().swapWithIdle(kind, idx) } },
+        "Swap with idle"),
     );
   }
   if (kind == AnimationKind.RANDOM) {

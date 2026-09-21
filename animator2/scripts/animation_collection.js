@@ -167,6 +167,56 @@ export class AnimationCollection {
   }
 
   /**
+   * Swap a random or command animation with the startup animation.
+   * @param {AnimationKind} kind
+   * @param {number} idx
+   */
+  swapWithStartup(kind, idx) {
+    console.assert(kind === AnimationKind.RANDOM || kind === AnimationKind.COMMAND);
+
+    const oldStartup = this.startupAnimation;
+    const theList = this.listForKind(kind);
+    this.startupAnimation = theList[idx];
+    theList[idx] = oldStartup;
+
+    const [currentKind, currentIdx] = this.currentlyEditing;
+    if (kind === currentKind && idx === currentIdx) {
+      this.currentlyEditing = [AnimationKind.STARTUP, null];
+    }
+    else if (currentKind === AnimationKind.STARTUP) {
+      this.currentlyEditing = [kind, idx];
+    }
+
+    console.debug(`AnimationCollection changed (swapWithStartup ${kind} ${idx})`);
+    document.dispatchEvent(animationCollectionChangedEvent);
+  }
+
+  /**
+   * Swap a random or command animation with the idle animation.
+   * @param {AnimationKind} kind
+   * @param {number} idx
+   */
+  swapWithIdle(kind, idx) {
+    console.assert(kind === AnimationKind.RANDOM || kind === AnimationKind.COMMAND);
+
+    const oldIdle = this.idleAnimation;
+    const theList = this.listForKind(kind);
+    this.idleAnimation = theList[idx];
+    theList[idx] = oldIdle;
+
+    const [currentKind, currentIdx] = this.currentlyEditing;
+    if (kind === currentKind && idx === currentIdx) {
+      this.currentlyEditing = [AnimationKind.IDLE, null];
+    }
+    else if (currentKind === AnimationKind.IDLE) {
+      this.currentlyEditing = [kind, idx];
+    }
+
+    console.debug(`AnimationCollection changed (swapWithIdle ${kind} ${idx})`);
+    document.dispatchEvent(animationCollectionChangedEvent);
+  }
+
+  /**
    * When an animation is removed from a list, currentlyEditing can become stale or invalid.
    * Pick a new value if necessary.
    * @param {*} removedKind
