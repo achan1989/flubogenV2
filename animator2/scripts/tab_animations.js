@@ -59,8 +59,14 @@ function makeSelectorListItem(name, kind, idx) {
 
   if (kind == AnimationKind.COMMAND) {
     buttons.push(
-      createElement("button", {}, "↑"),
-      createElement("button", {}, "↓"),
+      createElement(
+        "button",
+        { eventListener: { click: () => AppState.animations().moveUp(kind, idx) } },
+        "↑"),
+      createElement(
+        "button",
+        { eventListener: { click: () => AppState.animations().moveDown(kind, idx) } },
+        "↓"),
     );
   }
   if (kind == AnimationKind.RANDOM || kind == AnimationKind.COMMAND) {

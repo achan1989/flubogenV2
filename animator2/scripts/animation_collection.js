@@ -64,6 +64,67 @@ export class AnimationCollection {
   }
 
   /**
+   * Move an animation up.
+   * @param {*} kind
+   * @param {*} idx
+   */
+  moveUp(kind, idx) {
+    console.assert(kind !== AnimationKind.STARTUP);
+    console.assert(kind !== AnimationKind.IDLE);
+    console.assert(kind !== AnimationKind.RANDOM);
+    if (idx === 0) return;
+
+    const thisList = this.listForKind(kind);
+    const tempAnim = thisList[idx - 1];
+    thisList[idx - 1] = thisList[idx];
+    thisList[idx] = tempAnim;
+
+    const [currentKind, currentIdx] = this.currentlyEditing;
+    if (kind === currentKind) {
+      if (idx === currentIdx) {
+        this.currentlyEditing = [currentKind, idx - 1];
+      }
+      else if (idx - 1 === currentIdx) {
+        this.currentlyEditing = [currentKind, idx];
+      }
+    }
+
+    console.debug(`AnimationCollection changed (moved ${kind} ${idx})`);
+    document.dispatchEvent(animationCollectionChangedEvent);
+  }
+
+  /**
+   * Move an animation down.
+   * @param {*} kind
+   * @param {*} idx
+   */
+  moveDown(kind, idx) {
+    console.assert(kind !== AnimationKind.STARTUP);
+    console.assert(kind !== AnimationKind.IDLE);
+    console.assert(kind !== AnimationKind.RANDOM);
+
+    const thisList = this.listForKind(kind);
+    if (idx === (thisList.length - 1)) return;
+
+    const tempAnim = thisList[idx + 1];
+    thisList[idx + 1] = thisList[idx];
+    thisList[idx] = tempAnim;
+
+    const [currentKind, currentIdx] = this.currentlyEditing;
+    if (kind === currentKind) {
+      if (idx === currentIdx) {
+        this.currentlyEditing = [currentKind, idx + 1];
+      }
+      else if (idx + 1 === currentIdx) {
+        this.currentlyEditing = [currentKind, idx];
+      }
+    }
+
+    console.debug(`AnimationCollection changed (moved ${kind} ${idx})`);
+    document.dispatchEvent(animationCollectionChangedEvent);
+  }
+
+  /**
    * On list changes, currentlyEditing can become stale or invalid. Pick a new value if necessary.
    */
   resolveCurrentlyEditing() {
