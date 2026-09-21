@@ -1,3 +1,7 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
   background-color: #000000;
   color: #ffffff;
@@ -5,6 +9,7 @@ body {
 
 button {
   color: #ffffff;
+  background-color: #585858;
 }
 
 header nav {
@@ -26,4 +31,39 @@ header nav button.active {
 
 #tabContentWrapper .tabContent.active {
   display: block;
+}
+
+details {
+  border: 0.1em solid #cccccc;
+  border-radius: 1em;
+  padding: 0.5em;
+}
+
+.animationSelectorList {
+  padding-inline-start: 1em;
+}
+
+.animationSelectorList li {
+  display: grid;
+  grid-template-columns: 3ch 18ch 1fr;
+  gap: 0.3ch 0.3ch;
+  margin-block: 0.5ch;
+}
+
+.animationSelectorList > li > span:nth-child(1) {
+  visibility: hidden;
+}
+.animationSelectorList > li > span:nth-child(1).editing {
+  visibility: visible;
+}
+
+.animationSelectorList button {
+  margin-inline-end: 0.5ex;
+}
+
+#newRandomAnimation,
+#newCommandAnimation {
+  /* Not sure why this isn't just the sum of animationSelectorList:padding-inline-start and
+     the first of animationSelectorList:grid-template-columns (3ex) */
+  margin-inline-start: calc(1em + 4ch);
 }

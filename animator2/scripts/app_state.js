@@ -3,11 +3,14 @@
 // There's singleton global state that affects the application as a whole.
 
 import * as MatricesState from "./matrices_state.js";
+import * as AnimationCollection from "./animation_collection.js";
 
 
 class AppState {
   /** @type {MatricesState.MatricesState} */
   matrices;
+  /** @type {AnimationCollection.AnimationCollection} */
+  animations;
 };
 
 let state;
@@ -18,6 +21,7 @@ let state;
 export function initNewProject() {
   state = new AppState();
   state.matrices = MatricesState.forNewProject();
+  state.animations = AnimationCollection.forNewProject();
 }
 
 /**
@@ -25,4 +29,11 @@ export function initNewProject() {
  */
 export function matrices() {
   return state.matrices;
+}
+
+/**
+ * @returns {AnimationCollection.AnimationCollection}
+ */
+export function animations() {
+  return state.animations;
 }
