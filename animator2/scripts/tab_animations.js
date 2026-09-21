@@ -79,6 +79,24 @@ function makeSelectorListItem(name, kind, idx) {
       createElement("button", {}, "Swap with idle"),
     );
   }
+  if (kind == AnimationKind.RANDOM) {
+    buttons.push(
+      createElement(
+        "button",
+        { eventListener: { click: () => AppState.animations().moveToCommand(kind, idx) } },
+        "Move to Command"
+      )
+    );
+  }
+  if (kind == AnimationKind.COMMAND) {
+    buttons.push(
+      createElement(
+        "button",
+        { eventListener: { click: () => AppState.animations().moveToRandom(kind, idx) } },
+        "Move to Random"
+      )
+    );
+  }
 
   const showEditing = { class: "editing" };
   const hideEditing = {};

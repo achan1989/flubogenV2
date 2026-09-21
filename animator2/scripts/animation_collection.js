@@ -125,6 +125,48 @@ export class AnimationCollection {
   }
 
   /**
+   * Move an animation to the command list
+   * @param {AnimationKind} kind
+   * @param {number} idx
+   */
+  moveToCommand(kind, idx) {
+    console.assert(kind === AnimationKind.RANDOM);
+
+    const randAnim = this.randomAnimations.splice(idx, 1)[0];
+    const newIdx = this.commandAnimations.push(randAnim) - 1;
+
+    const [currentKind, currentIdx] = this.currentlyEditing;
+    if (kind === currentKind && idx === currentIdx) {
+      this.currentlyEditing = [AnimationKind.COMMAND, newIdx];
+    }
+    this.resolveCurrentlyEditing(kind, idx);
+
+    console.debug(`AnimationCollection changed (moveToCommand ${kind} ${idx})`);
+    document.dispatchEvent(animationCollectionChangedEvent);
+  }
+
+  /**
+   * Move an animation to the random list
+   * @param {AnimationKind} kind
+   * @param {number} idx
+   */
+  moveToRandom(kind, idx) {
+    console.assert(kind === AnimationKind.COMMAND);
+
+    const cmdAnim = this.commandAnimations.splice(idx, 1)[0];
+    const newIdx = this.randomAnimations.push(cmdAnim) - 1;
+
+    const [currentKind, currentIdx] = this.currentlyEditing;
+    if (kind === currentKind && idx === currentIdx) {
+      this.currentlyEditing = [AnimationKind.RANDOM, newIdx];
+    }
+    this.resolveCurrentlyEditing(kind, idx);
+
+    console.debug(`AnimationCollection changed (moveToRandom ${kind} ${idx})`);
+    document.dispatchEvent(animationCollectionChangedEvent);
+  }
+
+  /**
    * When an animation is removed from a list, currentlyEditing can become stale or invalid.
    * Pick a new value if necessary.
    * @param {*} removedKind
