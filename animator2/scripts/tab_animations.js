@@ -50,9 +50,12 @@ function makeSelectorListItem(name, kind, idx) {
   const [editingKind, editingIdx] = AppState.animations().currentlyEditing;
   const thisEditing = (kind === editingKind && idx === editingIdx);
 
-  const editButton = createElement("button", {}, "Edit");
-  editButton.addEventListener("click", () => AppState.animations().setEditing(kind, idx));
-  const buttons = [editButton];
+  const buttons = [
+    createElement(
+      "button",
+      { eventListener: { click: () => AppState.animations().setEditing(kind, idx) } },
+      "Edit")
+  ];
 
   if (kind == AnimationKind.COMMAND) {
     buttons.push(
@@ -62,13 +65,16 @@ function makeSelectorListItem(name, kind, idx) {
   }
   if (kind == AnimationKind.RANDOM || kind == AnimationKind.COMMAND) {
     buttons.push(
-      createElement("button", {}, "Delete"),
+      createElement(
+        "button",
+        { eventListener: { click: () => AppState.animations().delete(kind, idx) } },
+        "Delete"),
       createElement("button", {}, "Swap with startup"),
       createElement("button", {}, "Swap with idle"),
     );
   }
 
-  const showEditing = {class: "editing"};
+  const showEditing = { class: "editing" };
   const hideEditing = {};
   const li = createElement("li", {}, [
     createElement("span", thisEditing ? showEditing : hideEditing, "📝"),
