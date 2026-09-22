@@ -1,5 +1,6 @@
 import {Enum} from "./enum.js";
-import { defaultFace, defaultLogo, defaultLeg } from "./matrices_default_configuration.js";
+import { defaultFace, defaultCheeks, defaultShoulders, defaultLegs } from "./matrices_default_configuration.js";
+import { MatrixDefinition } from "./matrix_types.js"
 
 
 export class MatricesState {
@@ -15,9 +16,9 @@ export function forNewProject() {
   state.configurationChoice = ConfigurationChoice.DEFAULT;
   state.defaultMatrices = [
     defaultFace(),
-    defaultLogo(), // cheek
-    defaultLogo(), // shoulder
-    defaultLeg(),
+    defaultCheeks(),
+    defaultShoulders(),
+    defaultLegs(),
   ];
   return state;
 }
