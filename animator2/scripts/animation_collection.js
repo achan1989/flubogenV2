@@ -281,7 +281,7 @@ export function forNewProject() {
 
   collection.startupAnimation = new Animation();
   collection.idleAnimation = new Animation();
-  collection.randomAnimations = [new Animation()];
+  collection.randomAnimations = [];
   collection.commandAnimations = [];
 
   collection.currentlyEditing = [AnimationKind.STARTUP, null];
