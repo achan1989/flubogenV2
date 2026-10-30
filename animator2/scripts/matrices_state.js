@@ -9,6 +9,21 @@ export class MatricesState {
 
   /** @type {MatrixDefinition[]} */
   defaultMatrices;
+
+  /**
+   * Get the current matrix definitions.
+   * @returns {MatrixDefinition[]}
+   */
+  getMatrices() {
+    switch (this.configurationChoice) {
+      case ConfigurationChoice.DEFAULT:
+        return this.defaultMatrices;
+      case ConfigurationChoice.CUSTOM:
+        throw new Error("Unimplemented: custom matrices");
+      default:
+        throw new Error(`Invalid matrix configuration choice ${this.configurationChoice}`);
+    }
+  }
 };
 
 export function forNewProject() {

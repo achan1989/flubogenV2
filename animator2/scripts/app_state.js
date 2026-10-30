@@ -21,7 +21,7 @@ let state;
 export function initNewProject() {
   state = new AppState();
   state.matrices = MatricesState.forNewProject();
-  state.animations = AnimationCollection.forNewProject();
+  state.animations = AnimationCollection.forNewProject(state.matrices.getMatrices().length);
 }
 
 /**

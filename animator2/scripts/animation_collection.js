@@ -2,6 +2,8 @@
 
 import {Enum} from "./enum.js";
 import { animationCollectionChangedEvent } from "./events.js";
+import { MatricesState } from "./matrices_state.js";
+import { MatrixDefinition } from "./matrix_types.js"
 
 
 export class AnimationCollection {
@@ -274,13 +276,40 @@ export class AnimationCollection {
         throw new Error(`Invalid kind ${kind}`);
     }
   }
+
+  /**
+   * Get an animation.
+   * @param {AnimationKind} kind
+   * @param {number} idx
+   * @returns {Animation}
+   */
+  get(kind, idx) {
+    switch (kind) {
+      case AnimationKind.STARTUP:
+        console.assert(idx === null);
+        return this.startupAnimation;
+      case AnimationKind.IDLE:
+        console.assert(idx === null);
+        return this.idleAnimation;
+      case AnimationKind.RANDOM:
+        return this.randomAnimations[idx];
+      case AnimationKind.COMMAND:
+        return this.commandAnimations[idx];
+      default:
+        throw new Error(`Invalid animation ${kind} ${idx}`);
+    }
+  }
 };
 
-export function forNewProject() {
+/**
+ * @param {number} nMatrices
+ * @returns {AnimationCollection}
+ */
+export function forNewProject(nMatrices) {
   const collection = new AnimationCollection();
 
-  collection.startupAnimation = new Animation();
-  collection.idleAnimation = new Animation();
+  collection.startupAnimation = new Animation(nMatrices);
+  collection.idleAnimation = new Animation(nMatrices);
   collection.randomAnimations = [];
   collection.commandAnimations = [];
 
@@ -292,6 +321,26 @@ export function forNewProject() {
 export class Animation {
   nFrames = 1;
   fps = 10;
+  /** @type {AnimationMatrixSetting[]} */
+  matricesSettings;
+
+  /**
+   * Create a default empty animation.
+   * @param {number} nMatrices Initialise with the default AnimationMatrixSetting for each of
+   * these n matrices.
+   */
+  constructor(nMatrices) {
+    this.matricesSettings = [];
+    for (let i = 0; i < nMatrices; i++) {
+      this.matricesSettings.push(new AnimationMatrixSetting());
+    }
+  }
+}
+
+export class AnimationMatrixSetting {
+  matrixUse = MatrixUse.ANIMATED;
+  constantColour = "#00ad00";
 }
 
 export const AnimationKind = Enum("STARTUP", "IDLE", "RANDOM", "COMMAND");
+export const MatrixUse = Enum("ANIMATED", "CONSTANT_COLOUR", "OFF");
