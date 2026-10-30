@@ -1,6 +1,15 @@
 import { AnimationKind } from "./animation_collection.js";
 import * as AppState from "./app_state.js";
 import { createElement } from "./dom.js";
+import { MatrixEditor } from "./matrix_editor.js";
+import { ConfigurationChoice } from "./matrices_state.js";
+import { MatrixDefinition } from "./matrix_types.js";
+
+
+/** @type {HTMLElement} */
+let container;
+let editors;
+let resizeObserver;
 
 
 export function init() {
@@ -13,6 +22,20 @@ export function init() {
   document.querySelector("#newCommandAnimation").addEventListener("click", (evt) => {
     AppState.animations().add(AnimationKind.COMMAND);
   });
+
+  container = document.querySelector("#animation_matrices_container");
+  editors = [];
+
+  if (AppState.matrices().configurationChoice == ConfigurationChoice.DEFAULT) {
+    for (const matrixDef of AppState.matrices().defaultMatrices) {
+      appendEditor(matrixDef);
+    }
+  } else {
+    throw new Error("Unimplemented: custom matrices");
+  }
+
+  resizeObserver = new ResizeObserver(onContainerResized);
+  resizeObserver.observe(container);
 }
 
 /**
@@ -112,4 +135,33 @@ function makeSelectorListItem(name, kind, idx) {
     createElement("span", {}, buttons),
   ]);
   return li;
+}
+
+/**
+ * Append a matrix editor to the animations tab, under the animation selector box.
+ * @param {MatrixDefinition} matrixDefinition Defines the shape of the matrix etc.
+ * @returns the editor object.
+ */
+function appendEditor(matrixDefinition) {
+  const canvas = document.createElement("canvas");
+  container.appendChild(canvas);
+  container.appendChild(document.createElement("hr"));
+
+  const maxWidth = Math.round(container.clientWidth);
+  const editor = new MatrixEditor(canvas, maxWidth, matrixDefinition);
+  editors.push(editor);
+  return editor;
+}
+
+/**
+ * Resive the matrix editors when the window is resized.
+ * @param {ResizeObserverEntry[]} entries Should just be a single entry which is the div element
+ * holding the editor canvases.
+ * @param {ResizeObserver} observer 
+ */
+function onContainerResized(entries, observer) {
+  const maxWidth = entries[0].target.clientWidth;
+  for (const editor of editors) {
+    editor.setMaxWidth(maxWidth);
+  }
 }
