@@ -2,8 +2,7 @@
 
 import {Enum} from "./enum.js";
 import { animationCollectionChangedEvent } from "./events.js";
-import { MatricesState } from "./matrices_state.js";
-import { MatrixDefinition } from "./matrix_types.js"
+import * as AppState from "./app_state.js";
 
 
 export class AnimationCollection {
@@ -302,14 +301,13 @@ export class AnimationCollection {
 };
 
 /**
- * @param {number} nMatrices
  * @returns {AnimationCollection}
  */
-export function forNewProject(nMatrices) {
+export function forNewProject() {
   const collection = new AnimationCollection();
 
-  collection.startupAnimation = new Animation(nMatrices);
-  collection.idleAnimation = new Animation(nMatrices);
+  collection.startupAnimation = new Animation();
+  collection.idleAnimation = new Animation();
   collection.randomAnimations = [];
   collection.commandAnimations = [];
 
@@ -326,10 +324,9 @@ export class Animation {
 
   /**
    * Create a default empty animation.
-   * @param {number} nMatrices Initialise with the default AnimationMatrixSetting for each of
-   * these n matrices.
    */
-  constructor(nMatrices) {
+  constructor() {
+    const nMatrices = AppState.matrices().getMatrices().length;
     this.matricesSettings = [];
     for (let i = 0; i < nMatrices; i++) {
       this.matricesSettings.push(new AnimationMatrixSetting());
