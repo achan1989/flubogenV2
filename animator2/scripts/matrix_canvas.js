@@ -50,12 +50,12 @@ export class MatrixCanvas {
   }
 
   /**
-   * Draw the matrix within the allowed width.
+   * Draw the matrix editor within the allowed width.
    * @param {LedVis[][]} matrix
    * @param {number} maxWidth
    * @param {string} ledGapColour
    */
-  draw(matrix, maxWidth, ledGapColour) {
+  drawMatrixEditor(matrix, maxWidth, ledGapColour) {
     errorIfCantDraw(matrix, maxWidth);
 
     const [nRows, nCols] = getMatrixDimensions(matrix);

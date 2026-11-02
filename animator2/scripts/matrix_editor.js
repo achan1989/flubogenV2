@@ -68,7 +68,7 @@ export class MatrixEditor {
       })
     });
 
-    this.#matrixCanvas.draw(matrixVis, this.#maxWidth, LED_GAP_COLOUR);
+    this.#matrixCanvas.drawMatrixEditor(matrixVis, this.#maxWidth, LED_GAP_COLOUR);
   }
 
   /**
