@@ -1,4 +1,5 @@
-import { AnimationKind, MatrixUse } from "./animation_collection.js";
+import { MatrixUse } from "./animation.js";
+import { AnimationKind } from "./animation_collection.js";
 import * as AppState from "./app_state.js";
 import * as Dialog from "./dialog.js"
 import { createElement } from "./dom.js";
