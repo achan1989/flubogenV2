@@ -80,6 +80,67 @@ export class MatrixCanvas {
       }
     }
   }
+
+  /**
+   * Draw the animation editor within the allowed width.
+   * @param {LedVis[][]} matrix
+   * @param {number} maxWidth
+   * @param {string} ledGapColour
+   */
+  drawAnimationEditor(matrix, maxWidth, ledGapColour) {
+    errorIfCantDraw(matrix, maxWidth);
+
+    const [nRows, nCols] = getMatrixDimensions(matrix);
+    const [width, height, ledSize, ledGap] = calculateLayout(nRows, nCols, maxWidth);
+    this.#canvas.width = width;
+    this.#canvas.height = height;
+
+    // Draw the checkerboard background.
+    // First solid black...
+    const bgBlackColour = "#000000";
+    this.#ctx.fillStyle = bgBlackColour;
+    this.#ctx.fillRect(0, 0, width, height);
+    // Then lots of small white squares.
+    const bgWhiteColour = "#151515";
+    this.#ctx.fillStyle = bgWhiteColour;
+    const checkerSize = (ledSize + (1 * ledGap)) / 2;
+    for (let rowIdx = 0; rowIdx < nRows * 2; rowIdx++) {
+      const y = rowIdx * checkerSize;
+      const colStart = (rowIdx % 2) == 0 ? 0 : 1;
+      for (let colIdx = colStart; colIdx < nCols * 2; colIdx += 2) {
+        const x = colIdx * checkerSize;
+        this.#ctx.fillRect(x, y, checkerSize, checkerSize);
+      }
+    }
+
+    // Now each LED individually. This is the LED itself, plus the surrounding gap border.
+    // Which is actually a square that's a bit bigger than the LED, drawn underneath it.
+    const gapSquare = ledSize + (2 * ledGap);
+    for (let rowIdx = 0; rowIdx < nRows; rowIdx++) {
+      const row = matrix[rowIdx];
+      for (let colIdx = 0; colIdx < nCols; colIdx++) {
+        const led = row[colIdx];
+        if (!led.present) continue;
+
+        // Draw the gap square.
+        {
+          this.#ctx.fillStyle = ledGapColour;
+          // const x = colIdx * gapSquare;
+          // const y = rowIdx * gapSquare;
+          const x = colIdx * (ledGap + ledSize);
+          const y = rowIdx * (ledGap + ledSize);
+          this.#ctx.fillRect(x, y, gapSquare, gapSquare);
+        }
+        // Then the LED.
+        {
+          this.#ctx.fillStyle = led.colour;
+          const x = ledGap + (colIdx * (ledGap + ledSize));
+          const y = ledGap + (rowIdx * (ledGap + ledSize));
+          this.#ctx.fillRect(x, y, ledSize, ledSize);
+        }
+      }
+    }
+  }
 }
 
 
