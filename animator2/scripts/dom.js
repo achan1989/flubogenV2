@@ -16,28 +16,32 @@ export function createElement(tagName, properties, children) {
   /** @type {HTMLElement} */
   const e = document.createElement(tagName);
 
-  for (const key in properties) {
-    if (key === "eventListener") {
-      const eventSpecs = properties[key];
-      for (const eventName in eventSpecs) {
-        const handler = eventSpecs[eventName];
-        e.addEventListener(eventName, handler);
+  if (properties !== undefined) {
+    for (const key in properties) {
+      if (key === "eventListener") {
+        const eventSpecs = properties[key];
+        for (const eventName in eventSpecs) {
+          const handler = eventSpecs[eventName];
+          e.addEventListener(eventName, handler);
+        }
+      } else {
+        e.setAttribute(key, properties[key]);
       }
-    } else {
-      e.setAttribute(key, properties[key]);
     }
   }
 
-  if (typeof children === "string" || children instanceof String) {
-    const childNode = document.createTextNode(children);
-    e.appendChild(childNode);
-  } else {
-    for (const child of children) {
-      if (typeof child === "string" || child instanceof String) {
-        const childNode = document.createTextNode(child);
-        e.appendChild(childNode);
-      } else {
-        e.appendChild(child);
+  if (children !== undefined) {
+    if (typeof children === "string" || children instanceof String) {
+      const childNode = document.createTextNode(children);
+      e.appendChild(childNode);
+    } else {
+      for (const child of children) {
+        if (typeof child === "string" || child instanceof String) {
+          const childNode = document.createTextNode(child);
+          e.appendChild(childNode);
+        } else {
+          e.appendChild(child);
+        }
       }
     }
   }

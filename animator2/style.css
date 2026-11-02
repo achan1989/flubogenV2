@@ -67,3 +67,13 @@ details {
      the first of animationSelectorList:grid-template-columns (3ex) */
   margin-inline-start: calc(1em + 4ch);
 }
+
+#modalDialog {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: ffffff;
+}
+
+#modalDialog::backdrop {
+  background: rgba(255, 255, 255, 0.2);
+}

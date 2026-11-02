@@ -3,6 +3,7 @@ import { MatrixDefinition } from "./matrix_types.js"
 
 export function defaultFace() {
   const def = new MatrixDefinition();
+  def.name = "face";
   const O = true;
   const ˑ = false;
   def.leds = [
@@ -20,11 +21,10 @@ export function defaultFace() {
   return def;
 }
 
-export function defaultLogo() {
-  const def = new MatrixDefinition();
+function logoLeds() {
   const O = true;
   const ˑ = false;
-  def.leds = [
+  const leds = [
     [ˑ,ˑ,ˑ,O,ˑ,ˑ,ˑ],
     [ˑ,O,ˑ,ˑ,ˑ,O,ˑ],
     [ˑ,ˑ,ˑ,ˑ,ˑ,ˑ,ˑ],
@@ -33,11 +33,26 @@ export function defaultLogo() {
     [ˑ,O,ˑ,ˑ,ˑ,O,ˑ],
     [ˑ,ˑ,ˑ,O,ˑ,ˑ,ˑ],
   ];
+  return leds;
+}
+
+export function defaultCheeks() {
+  const def = new MatrixDefinition();
+  def.name = "cheeks";
+  def.leds = logoLeds();
   return def;
 }
 
-export function defaultLeg() {
+export function defaultShoulders() {
   const def = new MatrixDefinition();
+  def.name = "shoulders";
+  def.leds = logoLeds();
+  return def;
+}
+
+export function defaultLegs() {
+  const def = new MatrixDefinition();
+  def.name = "legs";
   const O = true;
   const ˑ = false;
   def.leds = [
