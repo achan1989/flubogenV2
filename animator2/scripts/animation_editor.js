@@ -1,3 +1,4 @@
+import { Enum } from "./enum.js";
 import {LedVis, MatrixCanvas} from "./matrix_canvas.js";
 import {MatrixDefinition} from "./matrix_types.js"
 
@@ -41,6 +42,10 @@ export class AnimationEditor {
     }
 
     this.setMaxWidth(maxWidth);
+
+    this.#canvasElement.addEventListener("contextmenu", (evt) => evt.preventDefault());
+    this.#canvasElement.addEventListener("mousedown", this.#handleMouseEvent.bind(this));
+    this.#canvasElement.addEventListener("mousemove", this.#handleMouseEvent.bind(this));
   }
 
   /**
@@ -80,4 +85,32 @@ export class AnimationEditor {
     nCols ??= 0;
     return [nRows, nCols];
   }
+
+  /**
+   * Handle the mouse clicks and click-drags on the canvas.
+   *
+   * Just prints to the console for now.
+   * @param {MouseEvent} evt
+   */
+  #handleMouseEvent(evt) {
+    const PRIMARY_BTN = 1;
+    const SECONDARY_BTN = 2;
+
+    const isPrimary = (evt.buttons & PRIMARY_BTN) !== 0;
+    const isSecondary = (evt.buttons & SECONDARY_BTN) !== 0;
+    const isInvalid = isPrimary && isSecondary;
+    if (isInvalid || !(isPrimary || isSecondary)) return;
+    const interaction = isPrimary ? Interaction.PRIMARY : Interaction.SECONDARY;
+
+    //console.debug(isPrimary, isSecondary, evt.type, evt.offsetX, evt.offsetY);
+    const [nRows, nCols] = this.getMatrixDimensions();
+    const [valid, row, col] = this.#matrixCanvas.xyToRowCol(
+      evt.offsetX, evt.offsetY, nRows, nCols, this.#maxWidth);
+    if (!valid) return;
+
+    const clickedLedPresent = this.#definition.leds[row][col];
+    console.debug(row, col, "is", clickedLedPresent ? "present" : "not present");
+  }
 }
+
+const Interaction = Enum("PRIMARY", "SECONDARY");
