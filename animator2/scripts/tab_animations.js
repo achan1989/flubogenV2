@@ -1,8 +1,9 @@
-import { AnimationKind, MatrixUse } from "./animation_collection.js";
+import { MatrixUse } from "./animation.js";
+import { AnimationKind } from "./animation_collection.js";
 import * as AppState from "./app_state.js";
 import * as Dialog from "./dialog.js"
 import { createElement } from "./dom.js";
-import { MatrixEditor } from "./matrix_editor.js";
+import { AnimationEditor } from "./animation_editor.js";
 import { ConfigurationChoice } from "./matrices_state.js";
 import { MatrixDefinition } from "./matrix_types.js";
 
@@ -154,7 +155,10 @@ function appendEditor(matrixDefinition) {
   container.appendChild(document.createElement("hr"));
 
   const maxWidth = Math.round(container.clientWidth);
-  const editor = new MatrixEditor(canvas, maxWidth, matrixDefinition);
+  const editor = new AnimationEditor(canvas, maxWidth, matrixDefinition);
+  editor.addInteractionCallback( (ctx) => {
+    console.debug("Animation tab code handling animator interaction:", ctx);
+  });
   editors.push(editor);
   return editor;
 }

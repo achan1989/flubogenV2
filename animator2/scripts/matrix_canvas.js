@@ -50,12 +50,12 @@ export class MatrixCanvas {
   }
 
   /**
-   * Draw the matrix within the allowed width.
+   * Draw the matrix editor within the allowed width.
    * @param {LedVis[][]} matrix
    * @param {number} maxWidth
    * @param {string} ledGapColour
    */
-  draw(matrix, maxWidth, ledGapColour) {
+  drawMatrixEditor(matrix, maxWidth, ledGapColour) {
     errorIfCantDraw(matrix, maxWidth);
 
     const [nRows, nCols] = getMatrixDimensions(matrix);
@@ -79,6 +79,94 @@ export class MatrixCanvas {
         this.#ctx.fillRect(x, y, ledSize, ledSize);
       }
     }
+  }
+
+  /**
+   * Draw the animation editor within the allowed width.
+   * @param {LedVis[][]} matrix
+   * @param {number} maxWidth
+   * @param {string} ledGapColour
+   */
+  drawAnimationEditor(matrix, maxWidth, ledGapColour) {
+    errorIfCantDraw(matrix, maxWidth);
+
+    const [nRows, nCols] = getMatrixDimensions(matrix);
+    const [width, height, ledSize, ledGap] = calculateLayout(nRows, nCols, maxWidth);
+    this.#canvas.width = width;
+    this.#canvas.height = height;
+
+    // Draw the checkerboard background.
+    // First solid black...
+    const bgBlackColour = "#000000";
+    this.#ctx.fillStyle = bgBlackColour;
+    this.#ctx.fillRect(0, 0, width, height);
+    // Then lots of small white squares.
+    const bgWhiteColour = "#151515";
+    this.#ctx.fillStyle = bgWhiteColour;
+    const checkerSize = (ledSize + (1 * ledGap)) / 2;
+    for (let rowIdx = 0; rowIdx < nRows * 2; rowIdx++) {
+      const y = rowIdx * checkerSize;
+      const colStart = (rowIdx % 2) == 0 ? 0 : 1;
+      for (let colIdx = colStart; colIdx < nCols * 2; colIdx += 2) {
+        const x = colIdx * checkerSize;
+        this.#ctx.fillRect(x, y, checkerSize, checkerSize);
+      }
+    }
+
+    // Now each LED individually. This is the LED itself, plus the surrounding gap border.
+    // Which is actually a square that's a bit bigger than the LED, drawn underneath it.
+    const gapSquare = ledSize + (2 * ledGap);
+    for (let rowIdx = 0; rowIdx < nRows; rowIdx++) {
+      const row = matrix[rowIdx];
+      for (let colIdx = 0; colIdx < nCols; colIdx++) {
+        const led = row[colIdx];
+        if (!led.present) continue;
+
+        // Draw the gap square.
+        {
+          this.#ctx.fillStyle = ledGapColour;
+          // const x = colIdx * gapSquare;
+          // const y = rowIdx * gapSquare;
+          const x = colIdx * (ledGap + ledSize);
+          const y = rowIdx * (ledGap + ledSize);
+          this.#ctx.fillRect(x, y, gapSquare, gapSquare);
+        }
+        // Then the LED.
+        {
+          this.#ctx.fillStyle = led.colour;
+          const x = ledGap + (colIdx * (ledGap + ledSize));
+          const y = ledGap + (rowIdx * (ledGap + ledSize));
+          this.#ctx.fillRect(x, y, ledSize, ledSize);
+        }
+      }
+    }
+  }
+
+  /**
+   * Turn a mouse x,y position into an LED row and column.
+   * @param {number} x Mouse x, relative to the left edge of the canvas.
+   * @param {number} y Mouse y, relative to the top edge of the canvas.
+   * @param {number} nRows How many rows of LEDs there are.
+   * @param {number} nCols How many columns of LEDs there are.
+   * @param {number} maxWidth The width allowed for the drawing.
+   * @returns {[boolean, number, number]} [valid, row, column]. `valid` can be false when the mouse
+   * is near the edge of the canvas.
+   */
+  xyToRowCol(x, y, nRows, nCols, maxWidth) {
+    // Thinking about just the horizontal direction for simplicity, the LEDs are drawn as:
+    //     ...full border, LED width, full border, LED width...
+    // But the left half of a border should be considered as belonging to the left LED, and the
+    // right half belonging to the right LED. At the extreme edges of the canvas, this could give
+    // LEDs that don't exist, so be careful there.
+    const [width, height, ledSize, ledGap] = calculateLayout(nRows, nCols, maxWidth);
+    const offset = -ledGap;
+    const period = ledSize + ledGap;
+    x += offset;
+    y += offset;
+    const row = Math.floor(y / period);
+    const col = Math.floor(x / period);
+    const valid = (row >= 0 && row < nRows) && (col >= 0 && col < nCols);
+    return [valid, row, col];
   }
 }
 
@@ -155,6 +243,6 @@ function calculateLayout(nRows, nCols, maxWidth) {
     [width, height] = getDrawingDimensions(nRows, nCols, ledSize, ledGap);
   }
 
-  console.debug(`calculateLayout() ${nCols}x${nRows} ledSize=${ledSize} ledGap=${ledGap} width=${width} height=${height}`);
+  //console.debug(`calculateLayout() ${nCols}x${nRows} ledSize=${ledSize} ledGap=${ledGap} width=${width} height=${height}`);
   return [width, height, ledSize, ledGap];
 }
