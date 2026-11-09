@@ -25,6 +25,9 @@ export class AnimationEditor {
   /** @type {MatrixDefinition} */
   #definition;
 
+  /** @type {AnimationEditorInteractionCallback[]} */
+  #interactionCallbacks;
+
 
   /**
    * Create a new MatrixEditor.
@@ -40,6 +43,8 @@ export class AnimationEditor {
     if (this.#definition === undefined) {
       throw new Error("matrix definition is missing");
     }
+
+    this.#interactionCallbacks = [];
 
     this.setMaxWidth(maxWidth);
 
@@ -89,7 +94,9 @@ export class AnimationEditor {
   /**
    * Handle the mouse clicks and click-drags on the canvas.
    *
-   * Just prints to the console for now.
+   * If this is a valid click on an LED, notifies by calling any callbacks registered with
+   * `addInteractionCallback()`.
+   *
    * @param {MouseEvent} evt
    */
   #handleMouseEvent(evt) {
@@ -100,7 +107,6 @@ export class AnimationEditor {
     const isSecondary = (evt.buttons & SECONDARY_BTN) !== 0;
     const isInvalid = isPrimary && isSecondary;
     if (isInvalid || !(isPrimary || isSecondary)) return;
-    const interaction = isPrimary ? Interaction.PRIMARY : Interaction.SECONDARY;
 
     //console.debug(isPrimary, isSecondary, evt.type, evt.offsetX, evt.offsetY);
     const [nRows, nCols] = this.getMatrixDimensions();
@@ -108,9 +114,77 @@ export class AnimationEditor {
       evt.offsetX, evt.offsetY, nRows, nCols, this.#maxWidth);
     if (!valid) return;
 
-    const clickedLedPresent = this.#definition.leds[row][col];
-    console.debug(row, col, "is", clickedLedPresent ? "present" : "not present");
+    const isClickedLedPresent = this.#definition.leds[row][col];
+    if (isClickedLedPresent) {
+      const kind = isPrimary ? Interaction.PRIMARY : Interaction.SECONDARY;
+      const context = new AnimationEditorInteraction(this, kind, row, col);
+      this.#dispatchInteractionCallback(context);
+    }
+  }
+
+  /**
+   * Add a callback to handle user interactions with the animation editor canvas.
+   * @param {AnimationEditorInteractionCallback} callback 
+   */
+  addInteractionCallback(callback) {
+    this.#interactionCallbacks.push(callback);
+  }
+
+  /**
+   * Dispatch the interaction event to callbacks.
+   * @param {AnimationEditorInteraction} context for the callback.
+   */
+  #dispatchInteractionCallback(context) {
+    for (const callbackFn of this.#interactionCallbacks) {
+      callbackFn(context);
+    }
   }
 }
 
+
 const Interaction = Enum("PRIMARY", "SECONDARY");
+
+
+/**
+ * The callback type for user interactions with the animation editor canvas.
+ * @callback AnimationEditorInteractionCallback
+ * @param {AnimationEditorInteraction} context All of the related information.
+ */
+
+export class AnimationEditorInteraction {
+  #target;
+  #kind;
+  #row;
+  #col;
+
+  /**
+   * @param {AnimationEditor} target Owning editor object.
+   * @param {Interaction} kind of interaction.
+   * @param {Number} row
+   * @param {Number} col
+   */
+  constructor(target, kind, row, col) {
+    this.#target = target;
+    this.#kind = kind;
+    this.#row = row;
+    this.#col = col;
+  }
+
+  /** @return {AnimationEditor} Editor object that owns the interacted canvas. */
+  get target() { return this.#target; }
+
+  /**
+   * @return {Interaction} Interaction kind; primary or secondary.
+   */
+  get kind() { return this.#kind; }
+
+  /**
+   * @return {Number} The row number of the LED that was clicked.
+   */
+  get row() { return this.#row; }
+
+  /**
+   * @return {Number} The column number of the LED that was clicked.
+   */
+  get col() { return this.#col; }
+}

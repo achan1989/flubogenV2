@@ -156,6 +156,9 @@ function appendEditor(matrixDefinition) {
 
   const maxWidth = Math.round(container.clientWidth);
   const editor = new AnimationEditor(canvas, maxWidth, matrixDefinition);
+  editor.addInteractionCallback( (ctx) => {
+    console.debug("Animation tab code handling animator interaction:", ctx);
+  });
   editors.push(editor);
   return editor;
 }
