@@ -5,6 +5,7 @@ body {
 
 button {
   color: #ffffff;
+  background-color: #585858;
 }
 
 header nav {
@@ -18,4 +19,14 @@ header nav button {
 
 header nav button.active {
   background-color: #dd5858;
+}
+
+.modal-dialog {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: ffffff;
+}
+
+.modal-dialog::backdrop {
+  background-color: #00000090;
 }

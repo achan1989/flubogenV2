@@ -15,9 +15,36 @@ import { reactive } from 'vue'
 import { Enum } from "./Enum.js";
 
 
-export const Workflow = Enum("NONE");
+export const Workflow = Enum("NONE", "DEFAULT_LEDS");
+
+/**
+ * Get the printable name for a given Workflow enum.
+ * @param {Workflow} workflowEnum 
+ * @returns {String}
+ */
+function getWorkflowName(workflowEnum) {
+  switch (workflowEnum) {
+    case Workflow.NONE:
+      return "none";
+
+    case Workflow.DEFAULT_LEDS:
+      return "default LEDs"
+
+    default:
+      throw new Error(`Not a valid Workflow enum value: ${workflowEnum}`);
+  }
+}
 
 export class AppState {
+  /**
+   * The current workflow enum.
+   * @type {Workflow}
+   */
+  get workflow() { return this._workflow; }
+  /**
+   * The printable name for the current workflow.
+   */
+  get workflowName() { return getWorkflowName(this._workflow); }
   _workflow = Workflow.NONE;
 
   /**
