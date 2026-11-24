@@ -1,46 +1,53 @@
 /**
  * Holds the important global application state.
+ *
+ * Implementation note:
+ * We can't use a Javascript class with private variables; something about the way Vue uses it via
+ * a reactive proxy means the private variables become inaccessible.
+ * Instead we must use "fake" private variables, by convention only (begin a variable name with an
+ * underscore).
+ *
+ * As an alternative we could use old-school objects, but specifying getters/setters within an
+ * object constructor is a pain.
  */
 
-import { reactive, computed } from 'vue'
+import { reactive } from 'vue'
 import { Enum } from "./Enum.js";
 
 
 export const Workflow = Enum("NONE");
 
-/**
- * @constructor
- */
-function AppState() {
-  this._workflow = Workflow.NONE;
+export class AppState {
+  _workflow = Workflow.NONE;
 
   /**
-   * The available tabs.
+   * An iterator over the available tabs.
    * Each entry is [tab title, content component name]
    */
-  this._tabs = new Map([["Menu", "MenuContent"]]);
-  Object.defineProperty(this, "tabs", {get() { return this._tabs.entries(); }});
+  get tabs() { return this._tabs.entries(); }
+  _tabs = new Map([["Menu", "MenuContent"]]);
 
   /**
    * The title of the active tab.
-   * @type {String}
    */
-  this._activeTab = "Menu";
+  get activeTab() { return this._activeTab; }
   /**
-   * The name of the Vue component that provides the active tab's content.
-   * @type {String}
+   * Set the active tab to the one with this `title`.
+   * Throws an error if the `title` doesn't match any of the entires in `tabs`.
    */
-  this._activeTabComponent = "MenuContent";
-  Object.defineProperty(this, "activeTab", {
-    get() { return this._activeTab; },
-    set(title) {
-      const componentName = this._tabs.get(title);
-      if (componentName === undefined) { throw new Error(`Invalid tab name '${title}'`); }
-      this._activeTab = title;
-      this._activeTabComponent = componentName;
-    },
-  });
-  Object.defineProperty(this, "activeTabComponent", {get() { return this._activeTabComponent; }});
+  set activeTab(title) {
+    const componentName = this._tabs.get(title);
+    if (componentName === undefined) { throw new Error(`Invalid tab name '${title}'`); }
+    this._activeTab = title;
+    this._activeTabComponent = componentName;
+  }
+  _activeTab = "Menu";
+
+  /**
+   * The name of the component associated with the content for the active tab.
+   */
+  get activeTabComponent() { return this._activeTabComponent; }
+  _activeTabComponent = "MenuContent";
 }
 
 /**
