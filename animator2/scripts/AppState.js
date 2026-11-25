@@ -13,6 +13,7 @@
 
 import { reactive } from 'vue'
 import { Enum } from "./Enum.js";
+import { ProtogenDefinition } from "/scripts/ProtogenDefinition.js";
 
 
 export const Workflow = Enum("NONE", "DEFAULT_LEDS");
@@ -36,6 +37,9 @@ function getWorkflowName(workflowEnum) {
 }
 
 export class AppState {
+
+  /* --------- Simple properties --------- */
+
   /**
    * The current workflow enum.
    * @type {Workflow}
@@ -45,14 +49,21 @@ export class AppState {
    * The printable name for the current workflow.
    */
   get workflowName() { return getWorkflowName(this._workflow); }
-  _workflow = Workflow.NONE;
+  _workflow;
+
+  /**
+   * Defines the components of the Protogen.
+   * Will be `undefined` when the workflow is `NONE`.
+   * @type {ProtogenDefinition}
+   */
+  protogenDef;
 
   /**
    * An iterator over the available tabs.
    * Each entry is [tab title, content component name]
    */
   get tabs() { return this._tabs.entries(); }
-  _tabs = new Map([["Menu", "MenuContent"]]);
+  _tabs;
 
   /**
    * The title of the active tab.
@@ -68,13 +79,53 @@ export class AppState {
     this._activeTab = title;
     this._activeTabComponent = componentName;
   }
-  _activeTab = "Menu";
+  _activeTab;
 
   /**
    * The name of the component associated with the content for the active tab.
    */
   get activeTabComponent() { return this._activeTabComponent; }
-  _activeTabComponent = "MenuContent";
+  _activeTabComponent;
+
+
+  /* --------- More complex stuff --------- */
+
+  /**
+   * Create a new AppState in the no-workflow state.
+   */
+  constructor() {
+    this.reset();
+  }
+
+  /**
+   * Reset the AppState to its starting no-workflow state.
+   */
+  reset() {
+    this._workflow = Workflow.NONE;
+    this.protogenDef = undefined;
+    this._tabs = new Map([["Menu", "MenuContent"]]);
+    this.activeTab = "Menu";
+  }
+
+  /**
+   * Start a new workflow of the given kind.
+   * @param {String|Workflow} workflow New workflow.
+   */
+  newWorkflow(workflow) {
+    const workflowEnum = Workflow.parse(workflow);
+    switch (workflowEnum) {
+      case Workflow.DEFAULT_LEDS:
+        this.reset();
+        this._workflow = Workflow.DEFAULT_LEDS;
+        this.protogenDef = ProtogenDefinition.defaultProtogen();
+        this._tabs.set("Animations", "AnimationsContent");
+        break;
+
+      case Workflow.NONE:
+      default:
+        throw new Error(`Not a valid Workflow enum value for a new workflow: ${workflowEnum}`);
+    }
+  }
 }
 
 /**

@@ -3,7 +3,7 @@
  */
 
 import { ref, useTemplateRef } from 'vue';
-import { appState } from '/scripts/AppState.js';
+import { appState, Workflow } from '/scripts/AppState.js';
 import ModalDialog from '/components/ModalDialog.js';
 
 
@@ -17,6 +17,7 @@ export default {
 
     return {
       appState,
+      Workflow,
       newProjectDialog,
     };
   },
@@ -32,11 +33,14 @@ export default {
 
   <ModalDialog
     ref="new-project-dialog"
-    @confirmed="(result) => console.log('new project confirmed: ' + result)"
+    @confirmed="(workflowString) => appState.newWorkflow(workflowString)"
   >
     Create a new project:
     <ul>
-      <li><button @click="newProjectDialog.confirm('default')">Default LEDs</button>Use the default matrix configuration.</li>
+      <li>
+        <button @click="newProjectDialog.confirm(Workflow.DEFAULT_LEDS)">Default LEDs</button>
+        Use the default LED matrices (face, cheeks, shoulders, legs).
+      </li>
       <li><button @click="newProjectDialog.cancel()">Cancel</button></li>
     </ul>
   </ModalDialog>
