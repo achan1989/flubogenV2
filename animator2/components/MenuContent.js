@@ -3,7 +3,7 @@
  */
 
 import { ref, useTemplateRef } from 'vue';
-import { appState, Workflow } from '/scripts/AppState.js';
+import { appState, Workflow } from '/state/AppState.js';
 import ModalDialog from '/components/ModalDialog.js';
 
 

@@ -12,8 +12,8 @@
  */
 
 import { reactive } from 'vue'
-import { Enum } from "./Enum.js";
-import { ProtogenDefinition } from "/scripts/ProtogenDefinition.js";
+import { Enum } from "/scripts/Enum.js";
+import { ProtogenDefinition } from "/state/ProtogenDefinition.js";
 
 
 export const Workflow = Enum("NONE", "DEFAULT_LEDS");

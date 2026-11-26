@@ -3,7 +3,7 @@
  * It swaps in the component for the active tab.
  */
 
-import { appState } from "/scripts/AppState.js";
+import { appState } from "/state/AppState.js";
 import MenuContent from "/components/MenuContent.js";
 
 

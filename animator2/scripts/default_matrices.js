@@ -2,7 +2,7 @@
  * LED matrix definitions for the default Protogen.
  */
 
-import { MatrixDefinition } from "./MatrixDefinition.js"
+import { MatrixDefinition } from "/state/MatrixDefinition.js"
 
 
 export function defaultFace() {

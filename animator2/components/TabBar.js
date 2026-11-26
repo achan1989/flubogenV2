@@ -4,7 +4,7 @@
  */
 
 import { ref } from 'vue';
-import { appState } from "/scripts/AppState.js";
+import { appState } from "/state/AppState.js";
 import Tab from "/components/Tab.js"
 
 

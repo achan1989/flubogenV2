@@ -1,5 +1,5 @@
-import { MatrixDefinition } from "./MatrixDefinition.js"
-import * as DefaultMatrices from "./default_matrices.js";
+import { MatrixDefinition } from "/state/MatrixDefinition.js"
+import * as DefaultMatrices from "/scripts/default_matrices.js";
 
 
 /**
