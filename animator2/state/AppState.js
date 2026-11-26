@@ -13,6 +13,7 @@
 
 import { reactive } from 'vue'
 import { Enum } from "/scripts/Enum.js";
+import { AnimationCollection } from "/state/AnimationCollection.js";
 import { ProtogenDefinition } from "/state/ProtogenDefinition.js";
 
 
@@ -36,6 +37,7 @@ function getWorkflowName(workflowEnum) {
   }
 }
 
+
 export class AppState {
 
   /* --------- Simple properties --------- */
@@ -57,6 +59,13 @@ export class AppState {
    * @type {ProtogenDefinition}
    */
   protogenDef;
+
+  /**
+   * The animations of the Protogen.
+   * Will be `undefined` when the workflow is `NONE`.
+   * @type {AnimationCollection}
+   */
+  animations;
 
   /**
    * An iterator over the available tabs.
@@ -103,6 +112,7 @@ export class AppState {
   reset() {
     this._workflow = Workflow.NONE;
     this.protogenDef = undefined;
+    this.animations = undefined;
     this._tabs = new Map([["Menu", "MenuContent"]]);
     this.activeTab = "Menu";
   }
@@ -118,6 +128,7 @@ export class AppState {
         this.reset();
         this._workflow = Workflow.DEFAULT_LEDS;
         this.protogenDef = ProtogenDefinition.defaultProtogen();
+        this.animations = AnimationCollection.forNewProject();
         this._tabs.set("Animations", "AnimationsContent");
         break;
 

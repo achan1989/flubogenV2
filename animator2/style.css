@@ -30,3 +30,13 @@ header nav button.active {
 .modal-dialog::backdrop {
   background-color: #00000090;
 }
+
+.animation-selector {
+  border: 0.1em solid #cccccc;
+  border-radius: 1em;
+  padding: 0.5em;
+}
+
+.invisible {
+  visibility: hidden;
+}

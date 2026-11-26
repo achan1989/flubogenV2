@@ -4,11 +4,13 @@
  */
 
 import { appState } from "/state/AppState.js";
+import AnimationsContent from "/components/AnimationsContent.js";
 import MenuContent from "/components/MenuContent.js";
 
 
 export default {
   components: {
+    AnimationsContent,
     MenuContent,
   },
 
